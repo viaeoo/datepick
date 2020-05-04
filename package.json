@@ -19,11 +19,11 @@
     "type": "git",
     "url": "https://github.com/viaeoo/datepick"
   },
+  "bugs": {
+    "url": "https://github.com/viaeoo/datepick/issues"
+  },
   "keywords": [
     "date",
-    "picker",
-    "date",
-    "calendar",
     "picker",
     "calendar"
   ],
