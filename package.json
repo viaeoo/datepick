@@ -13,7 +13,7 @@
     "lint:scss": "stylelint **/*.scss --syntax scss --fix",
     "prepare": "npm run build",
     "precommit": "lint-staged",
-    "trypublish": "npm publish || true"
+    "publish": "npm publish || true"
   },
   "repository": {
     "type": "git",
