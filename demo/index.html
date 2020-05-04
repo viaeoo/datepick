@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <title>Datepick</title>
+    <script src="../dist/datepick.js"></script>
+    <link rel="stylesheet" href="../dist/datepick.min.css">
+  </head>
+  <body>
+    <h1>기본 캘린더</h1>
+    <div id="calendarBasic"></div>
+
+    <h1>페이드 캘린더</h1>
+    <div id="calendarFade"></div>
+
+    <h1>스와이프 캘린더</h1>
+    <div id="calendarSwipe"></div>
+
+    <h1>텍스트 포맷 변경 캘린더</h1>
+    <div id="calendarFormat"></div>
+
+    <h1>초기 선택 값 없는 캘린더</h1>
+    <div id="calendarNoSelected"></div>
+    <script>
+      window.onload = function() {
+        const calendarBasic = document.getElementById('calendarBasic');
+        const calendarFade = document.getElementById('calendarFade');
+        const calendarSwipe = document.getElementById('calendarSwipe');
+        const calendarFormat = document.getElementById('calendarFormat');
+        const calendarNoSelected = document.getElementById('calendarNoSelected');
+
+        new Datepick(calendarBasic);
+
+        new Datepick(calendarFade, {
+          mode: 'fade',
+        });
+
+        new Datepick(calendarSwipe, {
+          mode: 'swipe',
+        });
+
+        new Datepick(calendarFormat, {
+          locale: {
+            days: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+            months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            monthsShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            today: 'Today',
+            clear: 'Clear',
+            format: 'yyyy-mm-dd',
+            titleFormat: 'yyyy.mm',
+          },
+        });
+
+        new Datepick(calendarNoSelected, {
+          dates: [],
+        })
+      }
+    </script>
+  </body>
+</html>
