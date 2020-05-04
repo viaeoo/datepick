@@ -11,9 +11,9 @@
     "lint": "eslint --ext .js --ignore-path .lintignore .",
     "lint:fix": "eslint --fix --ext .js --ignore-path .lintignore .",
     "lint:scss": "stylelint **/*.scss --syntax scss --fix",
-    "prepare": "npm run build",
+    "prepare": "npm run build:prod",
     "precommit": "lint-staged",
-    "publish": "npm publish || true"
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
