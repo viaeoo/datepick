@@ -1,6 +1,6 @@
 {
   "name": "datepick",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Date Picker Calendar",
   "main": "index.js",
   "scripts": {
@@ -8,12 +8,13 @@
     "build:prod": "cross-env NODE_ENV=production webpack",
     "dev": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .js --ignore-path .lintignore .",
-    "lint:fix": "eslint --fix --ext .js --ignore-path .lintignore .",
+    "lint": "eslint --ext .js --ignore-path .gitignore .",
+    "lint:fix": "eslint --fix --ext .js --ignore-path .gitignore .",
     "lint:scss": "stylelint **/*.scss --syntax scss --fix",
     "prepare": "npm run build:prod",
     "precommit": "lint-staged",
-    "publish": "npm publish"
+    "publish": "npm publish",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,7 @@
     "node-sass": "^4.14.0",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^8.0.2",
+    "standard-version": "^8.0.0",
     "stylelint": "^13.3.3",
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.17.1",
@@ -74,6 +76,42 @@
     "src/**/*.scss": [
       "npm run lint:scss",
       "git add"
+    ]
+  },
+  "standard-version": {
+    "types": [
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "perf",
+        "section": "Performance"
+      },
+      {
+        "type": "docs",
+        "hidden": true
+      },
+      {
+        "type": "style",
+        "hidden": true
+      },
+      {
+        "type": "refactor",
+        "hidden": true
+      },
+      {
+        "type": "chore",
+        "hidden": true
+      },
+      {
+        "type": "test",
+        "hidden": true
+      }
     ]
   }
 }
