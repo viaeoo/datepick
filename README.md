@@ -11,6 +11,9 @@ npm install --save datepick
 ### Getting Started
 
 ```
+// Import datepick.min.js
+// Import datepick.min.css
+
 <div id="calendar"></div>
 <script>
   const element = document.getElementById('calendar');
@@ -137,10 +140,101 @@ titleFormat: 'y년mm월',
 | Yes | Yes | Yes | Yes | Yes | Yes | Not yet |
 
 
+### Examples
+
+#### Basic
+```
+new Datepicker(element, { ...options });
+```
+
+#### Fade Mode
+```
+new Datepicker(element, {
+  mode: 'fade',
+  // If you want
+  // animationDirection: 'vertical' or 'horizon',
+});
+```
+
+#### Swipe Mode
+```
+new Datepicker(element, {
+  mode: 'swipe',
+  // If you want
+  // animationDuration: 100,
+  // animationDirection: 'vertical' or 'horizon',
+});
+```
+
+#### Range
+```
+new Datepicker(element, {
+  range: true,
+  // If you want
+  // rangeIncludeDisabled: false,
+  // rangeDistanceDay: null,
+});
+```
+
+#### Multiple
+```
+new Datepicker(element, {
+  multiple: true,
+  // If you want
+  // multipleMaximum: 0,
+});
+```
+
+#### Holiday
+```
+new Datepicker(element, {
+  // If you want
+  holidayDate: [
+    // 휴일 설정 예제
+    new Date(new Date().setDate(new Date().getDate() + 1)).setHours(0, 0, 0, 0),
+	],
+  beforeRender: function (datepicker, direction) {
+    // 렌더링 전 휴일 설정 예제
+    // holidayDate 날짜 추가
+    datepicker.options.holidayDate = [
+      new Date(new Date(datepicker.viewDate).setDate(new Date(datepicker.viewDate).getDate() + 1)).setHours(0, 0, 0, 0),
+    ];
+	},
+});
+```
+
+#### Grid Options
+```
+new Datepicker(element, {
+  // If you want
+  grid: 3,
+});
+```
+
+#### Custom Day Element
+```
+new Datepicker(element, {
+  // If you want
+  customDayElement: function (datepicker, date) {
+    /* 
+    * @param {Object} datepicker
+    * @param {Number} date
+	 	*/
+
+    // 커스텀 엘리먼트 설정시
+    // datepicker-cell 엘리먼트 안에 생성
+    // 리턴값은 엘리먼트를 포함한 string 값으로 리턴해야 함
+    
+    return '<span class="date">' + date.getDate() + '</span>'
+  },
+});
+```
+
 ### Todos
 
 - IE 11
 - Write test case
+- i18n
 - Select Time
 - Etc...
 
