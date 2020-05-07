@@ -39,4 +39,5 @@ webpack.config.js
 .eslintrc
 .editorconfig
 .babelrc
+.eslintrc
 .stylelintrc
