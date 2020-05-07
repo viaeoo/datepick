@@ -1,18 +1,4 @@
 {
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "entry"
-      }
-    ],
-    [
-      "minify",
-      {
-        "keepFnName": true
-      }
-    ]
-  ],
   "plugins": [
     "@babel/plugin-proposal-class-properties"
   ]
