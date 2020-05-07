@@ -1,7 +1,10 @@
 {
   "presets": [
     [
-      "@babel/preset-env"
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry"
+      }
     ],
     [
       "minify",
@@ -11,16 +14,6 @@
     ]
   ],
   "plugins": [
-    "@babel/plugin-proposal-class-properties",
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        "absoluteRuntime": false,
-        "corejs": 3,
-        "helpers": true,
-        "regenerator": true,
-        "useESModules": false
-      }
-    ]
+    "@babel/plugin-proposal-class-properties"
   ]
 }
