@@ -13,7 +13,7 @@ const path = require('path');
  */
 const getPackageJson = function (...args) {
   const packageJSON = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../package.json'))
+    fs.readFileSync(path.join(__dirname, '../package.json')),
   );
 
   if (!args.length) {
