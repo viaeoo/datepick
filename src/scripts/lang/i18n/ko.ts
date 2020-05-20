@@ -8,4 +8,4 @@ export const ko = {
   format: 'yyyy-mm-dd',
   titleFormat: 'yyyy년mm월',
   dowFormat: 'D',
-}
+};

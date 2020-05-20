@@ -25,22 +25,22 @@ import wrapper from './scripts/template/wrapper';
 import Days from './scripts/views/days';
 
 class Datepick {
-  element;
-  options;
+  element: Element;
+  options: any;
 
-  dates;
-  viewDate;
+  dates: Array<Date|number>;
+  viewDate: Date|number;
 
-  container;
-  main;
-  controls;
-  views;
+  container: Element;
+  main: Element;
+  controls: Record<string, any>;
+  views: any;
 
-  active;
+  active: boolean;
 
-  constructor (element: Element, options: Object) {
+  constructor (element: Element, options: Record<string, any>) {
     this.element = element;
-    this.options = deepCopy(Object.assign(deepCopy(defalutOptions), options ? options : {}));
+    this.options = deepCopy({ ...deepCopy(defalutOptions), ...options });
     this.dates = [];
 
     this.setInit();
@@ -51,12 +51,19 @@ class Datepick {
   // Set init
   setInit () {
     // Set initial date
-    if (!this.options.initialDate) {
+    if (
+      !this.options.initialDate
+    ) {
       this.options.initialDate = today();
-    } else if (!(this.options.initialDate instanceof Array) && !isDate(this.options.initialDate)) {
+    } else if (
+      !(this.options.initialDate instanceof Array) &&
+      !isDate(this.options.initialDate)
+    ) {
       throw new Error('Invalid initialDate');
-    } else if (this.options.initialDate instanceof Array) {
-      this.options.initialDate.map((date) => {
+    } else if (
+      this.options.initialDate instanceof Array
+    ) {
+      this.options.initialDate.map((date: Date|number) => {
         if (!isDate(date)) {
           throw new Error('Invalid initialDate');
         }
@@ -64,25 +71,40 @@ class Datepick {
     }
 
     // Set today
-    if (this.options.today || !isDate(this.options.today)) {
+    if (
+      this.options.today ||
+      !isDate(this.options.today)
+    ) {
       this.options.today = today();
     }
 
     // Set locale
-    if (this.options.locale && Object.keys(this.options.locale).length) {
-      this.options.locale = deepCopy(Object.assign(deepCopy(locale[this.options.lang]), this.options.locale));
+    if (
+      this.options.locale &&
+      Object.keys(this.options.locale).length
+    ) {
+      this.options.locale = deepCopy({ ...deepCopy(locale[this.options.lang]), ...this.options.locale });
     } else {
       this.options.locale = deepCopy(locale[this.options.lang]);
     }
 
     // Set dates
-    if (!this.options.dates || !(this.options.dates instanceof Array)) {
-      if (this.options.initialDate instanceof Array) {
-        if (this.options.range) {
+    if (
+      !this.options.dates ||
+      !(this.options.dates instanceof Array)
+    ) {
+      if (
+        this.options.initialDate instanceof Array
+      ) {
+        if (
+          this.options.range
+        ) {
           this.dates = this.options.initialDate.length > 1
             ? [ getTime(this.options.initialDate[0]), getTime(this.options.initialDate[1]) ]
             : [ getTime(this.options.initialDate[0]), addDays(getTime(this.options.initialDate[0]), 1) ];
-        } else if (this.options.multiple) {
+        } else if (
+          this.options.multiple
+        ) {
           this.dates = this.options.multipleMaximum !== 0
             ? this.options.initialDate.slice(0, this.options.multipleMaximum)
             : this.options.initialDate.map((date) => { return getTime(date); });
@@ -90,33 +112,57 @@ class Datepick {
           this.dates.push(this.options.initialDate[0]);
         }
       } else {
-        if (this.options.range) {
-          this.dates = [ getTime(this.options.initialDate), addDays(getTime(this.options.initialDate), 1) ];
-        } else if (this.options.multiple) {
+        if (
+          this.options.range
+        ) {
+          this.dates = [
+            getTime(this.options.initialDate),
+            addDays(getTime(this.options.initialDate), 1),
+          ];
+        } else if (
+          this.options.multiple
+        ) {
           this.dates.push(getTime(this.options.initialDate));
         } else {
           this.dates.push(getTime(this.options.initialDate));
         }
       }
     } else {
-      if ((this.options.range && this.options.dates.length > 2) || ((!this.options.range && !this.options.multiple) && this.options.dates.length > 1)) {
+      if (
+        (this.options.range && this.options.dates.length > 2) ||
+        ((!this.options.range && !this.options.multiple) && this.options.dates.length > 1)
+      ) {
         throw new Error('Invalid dates length');
       }
 
-      this.dates = this.options.dates.map((date) => { return getTime(date); });
+      this.dates = this.options.dates.map((date: Date|number) => {
+        return getTime(date);
+      });
     }
 
     // Set grid
-    if (this.options.grid && typeof this.options.grid === 'number' && this.options.grid !== 1) {
-      if (this.options.grid % 2 !== 1) {
+    if (
+      this.options.grid &&
+      typeof this.options.grid === 'number' &&
+      this.options.grid !== 1
+    ) {
+      if (
+        this.options.grid % 2 !== 1
+      ) {
         throw new Error('Grid option can only be odd');
       }
 
-      if (this.options.grid < 3 && (this.options.mode === 'swipe' || this.options.mode === 'fade')) {
+      if (
+        this.options.grid < 3 &&
+        (this.options.mode === 'swipe' || this.options.mode === 'fade')
+      ) {
         throw new Error('If Swipe or fade mode, Grid options is only values ​​greater than 3 are possible');
       }
     } else {
-      if (this.options.mode === 'swipe' || this.options.mode === 'fade') {
+      if (
+        this.options.mode === 'swipe' ||
+        this.options.mode === 'fade'
+      ) {
         this.options.grid = 3;
       } else {
         this.options.grid = 1;
@@ -132,7 +178,9 @@ class Datepick {
     let minDt = this.options.minDate;
     let maxDt = this.options.maxDate;
 
-    if (this.options.minDate !== undefined) {
+    if (
+      this.options.minDate !== undefined
+    ) {
       minDt = this.options.minDate === null
         ? dateValue(0, 0, 1)
         : this.validateDate(this.options.minDate, this.options.locale.format, this.options.locale, minDt);
@@ -140,7 +188,9 @@ class Datepick {
       delete this.options.minDate;
     }
 
-    if (this.options.maxDate !== undefined) {
+    if (
+      this.options.maxDate !== undefined
+    ) {
       maxDt = this.options.maxDate === null
         ? undefined
         : this.validateDate(this.options.maxDate, this.options.locale.format, this.options.locale, maxDt);
@@ -148,20 +198,27 @@ class Datepick {
       delete this.options.maxDate;
     }
 
-    if (maxDt < minDt) {
+    if (
+      maxDt < minDt
+    ) {
       this.options.minDate = maxDt;
       this.options.maxDate = minDt;
     } else {
-      if (this.options.minDate !== minDt) {
+      if (
+        this.options.minDate !== minDt
+      ) {
         this.options.minDate = this.options.minDate = minDt;
       }
-      if (this.options.maxDate !== maxDt) {
+
+      if (
+        this.options.maxDate !== maxDt
+      ) {
         this.options.maxDate = this.options.maxDate = maxDt;
       }
     }
   }
 
-  render (wrapper: Element, listeners: any) {
+  render (wrapper: string, listeners: any) {
     const container: any = parseHTML(wrapper).firstChild;
     const [ header, main, footer ] = container.childNodes;
     const [ prevBtn, title, nextBtn ] = header.lastElementChild.children;
@@ -174,15 +231,24 @@ class Datepick {
     this.controls = controls;
 
     // Add wrapper class
-    if (this.options.wrapperClass) {
+    if (
+      this.options.wrapperClass
+    ) {
       container.classList.add(this.options.wrapperClass);
     }
 
-    if (this.options.mode && typeof this.options.mode === 'string' && (this.options.mode === 'swipe' || this.options.mode === 'fade')) {
+    if (
+      this.options.mode &&
+      typeof this.options.mode === 'string' &&
+      (this.options.mode === 'swipe' || this.options.mode === 'fade')
+    ) {
       container.classList.add(this.options.mode);
     }
 
-    if (this.options.animationDirection && typeof this.options.animationDirection === 'string') {
+    if (
+      this.options.animationDirection &&
+      typeof this.options.animationDirection === 'string'
+    ) {
       container.classList.add(this.options.animationDirection);
     }
 
@@ -207,17 +273,23 @@ class Datepick {
     this.views.render();
 
     // If swipe mode
-    if (this.options.mode === 'swipe') {
+    if (
+      this.options.mode === 'swipe'
+    ) {
       this.views.days.style.transform = this.options.animationDirection === 'vertical'
-        ? `translateY(-${Math.round(this.options.grid / 2) * 100}%)`
-        : `translateX(-${Math.round(this.options.grid / 2) * 100}%)`;
+        ? `translateY(-${Math.floor(this.options.grid / 2) * 100}%)`
+        : `translateX(-${Math.floor(this.options.grid / 2) * 100}%)`;
     }
 
     // If default mode & grid > 1
-    if (this.options.mode !== 'fade' && this.options.mode !== 'swipe' && this.options.grid > 1) {
+    if (
+      this.options.mode !== 'fade' &&
+      this.options.mode !== 'swipe' &&
+      this.options.grid > 1
+    ) {
       this.views.days.style.transform = this.options.animationDirection === 'vertical'
-        ? `translateY(-${Math.round(this.options.grid / 2) * 100}%)`
-        : `translateX(-${Math.round(this.options.grid / 2) * 100}%)`;
+        ? `translateY(-${Math.floor(this.options.grid / 2) * 100}%)`
+        : `translateX(-${Math.floor(this.options.grid / 2) * 100}%)`;
     }
 
     // Gesture
@@ -231,7 +303,9 @@ class Datepick {
   }
 
   show () {
-    if (this.active) {
+    if (
+      this.active
+    ) {
       return;
     }
 
@@ -244,31 +318,35 @@ class Datepick {
     const { locale, range, multiple } = options;
 
     const callback = format
-      ? date => formatDate(date, format, locale)
-      : date => new Date(date);
+      ? (date: Date|number) => formatDate(date, format, locale)
+      : (date: Date|number) => new Date(date);
 
-    if (range || multiple) {
+    if (
+      range ||
+      multiple
+    ) {
       return this.dates.map(callback);
     }
 
-    if (dates.length > 0) {
+    if (
+      dates.length > 0
+    ) {
       return callback(dates[0]);
     }
   }
 
-  setDate (date, opts) {
+  setDate (date: Date|number, opts: any) {
     const { options, dates } = this;
     const { minDate, maxDate, locale, range, multiple } = options;
 
-    const setDateOptions = Object.assign({
-      clear: false,
-      render: true,
-    }, opts);
+    const setDateOptions = { ...{ clear: false, render: true }, ...opts };
 
-    if (setDateOptions.clear) {
+    if (
+      setDateOptions.clear
+    ) {
       this.dates = [];
     } else {
-      const newDate = isInRange(date, minDate, maxDate)
+      const newDate = isInRange(date instanceof Date ? date.getTime() : date, minDate, maxDate)
         ? parseDate(date, locale.format, locale)
         : null;
 
@@ -279,21 +357,34 @@ class Datepick {
       if (range) {
         const max = Math.max.apply(null, dates);
 
-        if (getTime(newDate) === getTime(today()) && setDateOptions.today) {
+        if (
+          getTime(newDate) === getTime(today()) && setDateOptions.today
+        ) {
           this.dates = [ newDate, addDays(newDate, 1) ];
-        } else if (!dates.length) {
+        } else if (
+          !dates.length
+        ) {
           this.dates.push(newDate);
-        } else if (dates.length === 2) {
+        } else if (
+          dates.length === 2
+        ) {
           this.dates = [];
           this.dates.push(newDate);
         } else {
-          if (newDate === dates[0] && options.isClickDayEqual && typeof options.isClickDayEqual === 'function') {
+          if (
+            newDate === dates[0] &&
+            options.isClickDayEqual &&
+            typeof options.isClickDayEqual === 'function'
+          ) {
             options.isClickDayEqual(this);
 
             return false;
           }
 
-          if (!options.rangeIncludeDisabled && options.disabledDate.length) {
+          if (
+            !options.rangeIncludeDisabled &&
+            options.disabledDate.length
+          ) {
             const newArr = this.dates.concat([ newDate ]);
             const newMax = Math.max.apply(null, newArr);
             const newMin = Math.min.apply(null, newArr);
@@ -374,54 +465,54 @@ class Datepick {
     const { minDate, maxDate } = options;
     const viewDate = dates.length > 0 ? dates[0] : this.viewDate;
 
-    return limitToRange(viewDate, minDate, maxDate);
+    return limitToRange(viewDate instanceof Date ? viewDate.getTime() : viewDate, minDate, maxDate);
   }
 
-  private validateDate(value, format, locale, origValue) {
+  private validateDate (value, format, locale, origValue) {
     const date = parseDate(value, format, locale);
-  
+
     return date !== undefined ? date : origValue;
   }
 
-  private renderSetting(datepick, options) {
+  private renderSetting (datepick, options) {
     // Set prev btn
     if (options.prevBtnText && typeof options.prevBtnText === 'string') {
       const prevBtn = datepick.controls.prevBtn;
       const prevBtnNode = parseHTML(options.prevBtnText);
-  
+
       if (prevBtnNode.childNodes.length > 0) {
         const prev = prevBtnNode.childNodes;
-  
+
         emptyChildNodes(prevBtn);
-  
+
         prev.forEach((node) => {
           prevBtn.appendChild(node.cloneNode(true));
         });
       }
     }
-  
+
     // Set next btn
     if (options.nextBtnText) {
       const nextBtn = datepick.controls.nextBtn;
       const nextBtnNode = parseHTML(options.nextBtnText);
-  
+
       if (nextBtnNode.childNodes.length > 0) {
         const next = nextBtnNode.childNodes;
-  
+
         emptyChildNodes(nextBtn);
-  
+
         next.forEach((node) => {
           nextBtn.appendChild(node.cloneNode(true));
         });
       }
     }
-  
+
     // Set today and clear btn text
     if (options.locale) {
       datepick.controls.todayBtn.textContent = options.locale.today;
       datepick.controls.clearBtn.textContent = options.locale.clear;
     }
-  
+
     // Set today btn show or hide
     if (options.hideTodayBtn !== undefined) {
       if (!options.hideTodayBtn) {
@@ -430,7 +521,7 @@ class Datepick {
         hideElement(datepick.controls.todayBtn);
       }
     }
-  
+
     // Set clear btn show or hide
     if (options.hideClearBtn !== undefined) {
       if (!options.hideClearBtn) {
@@ -439,7 +530,7 @@ class Datepick {
         hideElement(datepick.controls.clearBtn);
       }
     }
-  
+
     // Set today btn disabeld
     if (hasProperty(options, 'minDate') || hasProperty(options, 'maxDate')) {
       const { minDate, maxDate } = options;

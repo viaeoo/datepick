@@ -3,8 +3,8 @@ import Hammer from 'hammerjs';
 import { onClickPrevBtn, onClickNextBtn } from '../events/listeners';
 import { swipePlace } from '../events/effects';
 
-export function onTouchGesture (datepick) {
-  let hammer;
+export function onTouchGesture (datepick: any): void {
+  let hammer: Hammer;
 
   // Fade mode
   if (datepick.options.mode === 'fade') {
@@ -19,8 +19,11 @@ export function onTouchGesture (datepick) {
       ],
     });
 
-    hammer.on('swipe', (event) => {
-      if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading')) {
+    hammer.on('swipe', (event: any) => {
+      if (
+        datepick.views.view.classList.contains('effect')
+        || datepick.views.view.classList.contains('loading')
+      ) {
         return false;
       }
 
@@ -49,8 +52,11 @@ export function onTouchGesture (datepick) {
     });
 
     let init = null;
-    hammer.on('pan', (event) => {
-      if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading')) {
+    hammer.on('pan', (event: any) => {
+      if (
+        datepick.views.view.classList.contains('effect')
+        || datepick.views.view.classList.contains('loading')
+      ) {
         return false;
       }
 
@@ -96,7 +102,10 @@ export function onTouchGesture (datepick) {
   }
 
   // Default Animation (Touch)
-  if ((datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade') && datepick.options.grid === 1) {
+  if (
+    (datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade')
+    && datepick.options.grid === 1
+  ) {
     hammer = new Hammer(datepick.views.days, {
       recognizers: [
         [Hammer.Swipe, {
@@ -108,8 +117,11 @@ export function onTouchGesture (datepick) {
       ],
     });
 
-    hammer.on('swipe', (event) => {
-      if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading')) {
+    hammer.on('swipe', (event: any) => {
+      if (
+        datepick.views.view.classList.contains('effect')
+        || datepick.views.view.classList.contains('loading')
+      ) {
         return false;
       }
 
@@ -126,7 +138,10 @@ export function onTouchGesture (datepick) {
   }
 
   // Default Animation (Scroll)
-  if ((datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade') && datepick.options.grid > 1) {
+  if (
+    (datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade')
+    && datepick.options.grid > 1
+  ) {
     hammer = new Hammer(datepick.views.days, {
       recognizers: [
         [Hammer.Pan, {
@@ -137,13 +152,13 @@ export function onTouchGesture (datepick) {
       ],
     });
 
-    let grid = Math.round(datepick.options.grid / 2) * -100;
+    const grid = Math.floor(datepick.options.grid / 2) * -100;
     let init = null;
 
     let last = false;
     let first = false;
 
-    hammer.on('pan', (event) => {
+    hammer.on('pan', (event: any) => {
       if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading')) {
         return false;
       }

@@ -1,6 +1,6 @@
 import { createTagRepeat, optimizeTemplateHTML } from '../lib/utlis';
 
-const grid = (options, optimize = false) => {
+const grid = (options: any, optimize = false) => {
   return optimize
     ? optimizeTemplateHTML(`
       <div class="datepick-grid${options.gridClass ? ` ${options.gridClass}` : ''}">${createTagRepeat('span', 42)}</div>

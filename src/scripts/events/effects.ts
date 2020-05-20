@@ -1,4 +1,4 @@
-export function fade (datepick: any, direction: string|null) {
+export function fade (datepick: any, direction: string|null): Promise<boolean> {
   return new Promise((resolve) => {
     const now = datepick.views.grid[datepick.views.active];
 
@@ -6,7 +6,7 @@ export function fade (datepick: any, direction: string|null) {
       direction === 'next'
         ? datepick.views.active + 1
         : datepick.views.active - 1
-      ];
+    ];
 
     now.style.transition = `opacity ${datepick.options.animationDuration}ms ${datepick.options.animationTiming}`;
     target.style.transition = `opacity ${datepick.options.animationDuration}ms ${datepick.options.animationTiming}`;
@@ -23,7 +23,7 @@ export function fade (datepick: any, direction: string|null) {
   });
 }
 
-export function swipe (datepick: any, direction: string|null) {
+export function swipe (datepick: any, direction: string|null): Promise<boolean> {
   return new Promise((resolve) => {
     const calc = Math.floor(datepick.options.grid / 2) * 100;
     const init = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
@@ -42,7 +42,7 @@ export function swipe (datepick: any, direction: string|null) {
   });
 }
 
-export function swipePlace (datepick: any) {
+export function swipePlace (datepick: any): void {
   datepick.views.view.classList.add('effect');
 
   datepick.views.days.style.transition = `transform ${datepick.options.animationDuration}ms ${datepick.options.animationTiming}`;

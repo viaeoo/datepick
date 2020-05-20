@@ -1,6 +1,6 @@
 const listenerRegistry = new WeakMap();
 
-export function registerListeners (key: any, listeners: any) {
+export function registerListeners (key: any, listeners: Array<any>): void {
   let registered = listenerRegistry.get(key);
 
   if (!registered) {
@@ -14,8 +14,8 @@ export function registerListeners (key: any, listeners: any) {
   });
 }
 
-export function unregisterListeners (key: any) {
-  let listeners = listenerRegistry.get(key);
+export function unregisterListeners (key: any): boolean {
+  const listeners = listenerRegistry.get(key);
 
   if (!listeners) {
     return false;
@@ -28,11 +28,10 @@ export function unregisterListeners (key: any) {
   listenerRegistry.delete(key);
 }
 
-// Event.composedPath() polyfill for Edge
-// based on https://gist.github.com/kleinfreund/e9787d73776c0e3750dcfcdc89f100ec
 if (!Event.prototype.composedPath) {
   const getComposedPath: any = function (node: any) {
-    let parent;
+    let parent: any;
+
     if (node.parentNode) {
       parent = node.parentNode;
     } else if (node.host) {
@@ -53,21 +52,33 @@ if (!Event.prototype.composedPath) {
   };
 }
 
-function findFromPath(path: any, criteria: any, currentTarget: any, index = 0): any {
-  const el = path[index];
+function findFromPath (path: any, criteria: any, target: any, index = 0): any {
+  const element = path[index];
 
-  if (criteria(el)) {
-    return el;
-  } else if (el === currentTarget || !el.parentElement) {
-    // stop when reaching currentTarget or <html>
+  if (criteria(element)) {
+    return element;
+  } else if (
+    element === target ||
+    !element.parentElement
+  ) {
     return;
   }
 
-  return findFromPath(path, criteria, currentTarget, index + 1);
+  return findFromPath(path, criteria, target, index + 1);
 }
 
-// Search for the actual target of a delegated event
-export function findElementInEventPath (ev: any, selector: any) {
-  const criteria = typeof selector === 'function' ? selector : (el: any) => { return el.matches(selector); };
-  return findFromPath(ev.composedPath(), criteria, ev.currentTarget);
+if (!Element.prototype.matches) {
+  const proto: any = Element.prototype;
+
+  Element.prototype.matches = proto.msMatchesSelector || proto.webkitMatchesSelector;
+}
+
+export function findElementInEventPath (event: any, selector: any): any {
+  const criteria = typeof selector === 'function'
+    ? selector
+    : (el: any) => {
+      return el.matches(selector);
+    };
+
+  return findFromPath(event.composedPath(), criteria, event.currentTarget);
 }

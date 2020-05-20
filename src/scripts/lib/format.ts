@@ -7,37 +7,30 @@ export const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
 // pattern for non date parts
 export const reNonDateParts = /[\s!-/:-@[-`{-~年月日]+/;
 
+function padZero (num: number, length: number): string {
+  return num.toString().padStart(length, '0');
+}
+
+function normalizeMonth (monthIndex): any {
+  return monthIndex > -1
+    ? monthIndex % 12 :
+    normalizeMonth(monthIndex + 12);
+}
+
 // cache for persed formats
-let knownFormats = {};
+const knownFormats = {};
 
 // parse funtions for date parts
 const parseFns = {
-  y (date, year) {
-    return new Date(date).setFullYear(parseInt(year, 10));
+  y (date: Date|number, year: number) {
+    return new Date(date).setFullYear(year);
   },
 
   M: undefined,  // placeholder to maintain the key order
 
-  m (date, month, locale) {
+  m (date: Date|number, month: number) {
     const newDate = new Date(date);
-    let monthIndex = parseInt(month, 10) - 1;
-
-    if (isNaN(monthIndex)) {
-      if (!month) {
-        return NaN;
-      }
-
-      const monthName = month.toLowerCase();
-      const compareNames = name => name.toLowerCase().startsWith(monthName);
-
-      monthIndex = locale.monthsShort.findIndex(compareNames);
-
-      if (monthIndex < 0) {
-        monthIndex = locale.months.findIndex(compareNames);
-      }
-
-      return monthIndex < 0 ? NaN : newDate.setMonth(monthIndex);
-    }
+    const monthIndex = month - 1;
 
     newDate.setMonth(monthIndex);
 
@@ -46,60 +39,50 @@ const parseFns = {
       : newDate.getTime();
   },
 
-  d (date, day) {
-    return new Date(date).setDate(parseInt(day, 10));
+  d (date: Date|number, day: number) {
+    return new Date(date).setDate(day);
   },
 };
 
 parseFns.M = parseFns.m;
 
-// Date format
 const formatFns = {
-  d (date) {
+  d (date: Date) {
     return date.getDate();
   },
-  dd (date) {
+  dd (date: Date) {
     return padZero(date.getDate(), 2);
   },
-  D (date, locale) {
+  D (date: Date, locale: any) {
     return locale.daysShort[date.getDay()];
   },
-  DD (date, locale) {
+  DD (date: Date, locale: any) {
     return locale.days[date.getDay()];
   },
-  m (date) {
+  m (date: Date) {
     return date.getMonth() + 1;
   },
-  mm (date) {
+  mm (date: Date) {
     return padZero(date.getMonth() + 1, 2);
   },
-  M (date, locale) {
+  M (date: Date, locale: any) {
     return locale.monthsShort[date.getMonth()];
   },
-  MM (date, locale) {
+  MM (date: Date, locale: any) {
     return locale.months[date.getMonth()];
   },
-  y (date) {
+  y (date: Date) {
     return date.getFullYear();
   },
-  yy (date) {
+  yy (date: Date) {
     return padZero(date.getFullYear(), 2).slice(-2);
   },
-  yyyy (date) {
+  yyyy (date: Date) {
     return padZero(date.getFullYear(), 4);
   },
 };
 
-// get month index in normal range (0 - 11) from any number
-function normalizeMonth (monthIndex) {
-  return monthIndex > -1 ? monthIndex % 12 : normalizeMonth(monthIndex + 12);
-}
-
-function padZero (num, length) {
-  return num.toString().padStart(length, '0');
-}
-
-function parseFormatString (format) {
+function parseFormatString (format: string): any {
   if (typeof format !== 'string') {
     throw new Error('Invalid date format.');
   }
@@ -108,26 +91,33 @@ function parseFormatString (format) {
     return knownFormats[format];
   }
 
-  // sprit the format string into parts and seprators
   const separators = format.split(reFormatTokens);
   const parts = format.match(new RegExp(reFormatTokens, 'g'));
+
   if (separators.length === 0 || !parts) {
     throw new Error('Invalid date format.');
   }
 
-  const partFormatters = parts.map(token => formatFns[token]);
+  const partFormatters = parts.map((token) => {
+    return formatFns[token];
+  });
+
   const partParsers = Object.keys(parseFns).reduce((parsers, key) => {
     const token = parts.find(part => part[0] === key);
+
     if (!token) {
       return parsers;
     }
+
     parsers[key] = parseFns[key];
+
     return parsers;
   }, {});
+
   const partParserKeys = Object.keys(partParsers);
 
   return knownFormats[format] = {
-    parser (dateStr, locale) {
+    parser (dateStr: string, locale: any) {
       const dateParts = dateStr.split(reNonDateParts).reduce((dtParts, part, index) => {
         if (part.length > 0 && parts[index]) {
           const token = parts[index][0];
@@ -140,29 +130,30 @@ function parseFormatString (format) {
         return dtParts;
       }, {});
 
-      // iterate over partParsers' keys so that the parsing is made in the oder
-      // of year, month and day to prevent the day parser from correcting last
-      // day of month wrongly
       return partParserKeys.reduce((origDate, key) => {
         const newDate = partParsers[key](origDate, dateParts[key], locale);
-        // ingnore the part failed to parse
+
         return isNaN(newDate) ? origDate : newDate;
       }, today());
     },
 
-    formatter (date, locale) {
+    formatter (date: Date, locale: any) {
       let dateStr = partFormatters.reduce((str, fn, index) => {
         return str += `${separators[index]}${fn(date, locale)}`;
       }, '');
-      // separators' length is always parts' length + 1,
+
       return dateStr += lastItemOf(separators);
     },
   };
 }
 
-export function parseDate (dateStr, format, locale) {
-  if (dateStr instanceof Date || typeof dateStr === 'number') {
+export function parseDate (dateStr: string|Date|number, format: any, locale: any): any {
+  if (
+    dateStr instanceof Date
+    || typeof dateStr === 'number'
+  ) {
     const date = getTime(dateStr);
+
     return isNaN(date) ? undefined : date;
   }
 
@@ -176,22 +167,21 @@ export function parseDate (dateStr, format, locale) {
 
   if (format && format.toValue) {
     const date = format.toValue(dateStr, format, locale);
+
     return isNaN(date) ? undefined : getTime(date);
   }
 
   return parseFormatString(format).parser(dateStr, locale);
 }
 
-export function formatDate (date, format, locale) {
-  if (isNaN(date) || (!date && date !== 0)) {
+export function formatDate (date: Date|number, format: any, locale: any): any {
+  if (!date && date !== 0) {
     return '';
   }
 
-  const dateObj = typeof date === 'number' ? new Date(date) : date;
-
-  if (format.toDisplay) {
-    return format.toDisplay(dateObj, format, locale);
-  }
+  const dateObj = typeof date === 'number'
+    ? new Date(date)
+    : date;
 
   return parseFormatString(format).formatter(dateObj, locale);
 }

@@ -2,30 +2,37 @@ import { today } from '../lib/date';
 import { findElementInEventPath } from '../lib/event';
 import { fade, swipe } from './effects';
 
-export function onClickTodayBtn (datepick: any) {
-  try {
-    datepick.setDate(today(), { today: true });
+export function onClickTodayBtn (datepick: any): void {
+  datepick.setDate(today(), {
+    today: true,
+  });
 
-    if (new Date(datepick.viewDate).getMonth() !== new Date(today()).getMonth()) {
-      datepick.views.renderToday();
-    }
-  } catch (err) {}
+  if (new Date(datepick.viewDate).getMonth() !== new Date(today()).getMonth()) {
+    datepick.views.renderToday();
+  }
 }
 
-export function onClickClearBtn (datepick: any) {
-  try {
-    datepick.setDate(null, { clear: true });
-  } catch (err) {}
+export function onClickClearBtn (datepick: any): void {
+  datepick.setDate(null, {
+    clear: true,
+  });
 }
 
-export async function onClickPrevBtn (datepick: any, direct = false) {
-  if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.first <= datepick.options.minDate) {
+export async function onClickPrevBtn (datepick: any, direct = false): Promise<boolean> {
+  if (
+    datepick.views.view.classList.contains('effect')
+    || datepick.views.view.classList.contains('loading')
+    || datepick.views.first <= datepick.options.minDate
+  ) {
     return false;
   }
 
   datepick.views.view.classList.add('effect');
 
-  if (datepick.options.beforeEffect &&  typeof datepick.options.beforeEffect === 'function') {
+  if (
+    datepick.options.beforeEffect
+    && typeof datepick.options.beforeEffect === 'function'
+  ) {
     await datepick.options.beforeEffect(datepick, 'prev');
   }
 
@@ -45,8 +52,14 @@ export async function onClickPrevBtn (datepick: any, direct = false) {
 
   datepick.views.view.classList.remove('effect');
 
-  if (direct && datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade' && datepick.options.grid > 1 && datepick.options.touchEvent) {
-    const init = Math.round(datepick.options.grid / 2) * 100;
+  if (
+    direct
+    && datepick.options.mode !== 'swipe'
+    && datepick.options.mode !== 'fade'
+    && datepick.options.grid > 1
+    && datepick.options.touchEvent
+  ) {
+    const init = Math.floor(datepick.options.grid / 2) * 100;
     const transform = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
 
     if (transform !== init) {
@@ -56,19 +69,29 @@ export async function onClickPrevBtn (datepick: any, direct = false) {
     }
   }
 
-  if (datepick.options.afterEffect && typeof datepick.options.afterEffect === 'function') {
+  if (
+    datepick.options.afterEffect
+    && typeof datepick.options.afterEffect === 'function'
+  ) {
     await datepick.options.afterEffect(datepick, 'prev');
   }
 }
 
-export async function onClickNextBtn (datepick: any, direct = false) {
-  if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.last >= datepick.options.maxDate) {
+export async function onClickNextBtn (datepick: any, direct = false): Promise<boolean> {
+  if (
+    datepick.views.view.classList.contains('effect')
+    || datepick.views.view.classList.contains('loading')
+    || datepick.views.last >= datepick.options.maxDate
+  ) {
     return false;
   }
 
   datepick.views.view.classList.add('effect');
 
-  if (datepick.options.beforeEffect &&  typeof datepick.options.beforeEffect === 'function') {
+  if (
+    datepick.options.beforeEffect
+    && typeof datepick.options.beforeEffect === 'function'
+  ) {
     await datepick.options.beforeEffect(datepick, 'next');
   }
 
@@ -88,8 +111,14 @@ export async function onClickNextBtn (datepick: any, direct = false) {
 
   datepick.views.view.classList.remove('effect');
 
-  if (direct && datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade' && datepick.options.grid > 1 && datepick.options.touchEvent) {
-    const init = Math.round(datepick.options.grid / 2) * 100;
+  if (
+    direct
+    && datepick.options.mode !== 'swipe'
+    && datepick.options.mode !== 'fade'
+    && datepick.options.grid > 1
+    && datepick.options.touchEvent
+  ) {
+    const init = Math.floor(datepick.options.grid / 2) * 100;
     const transform = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
 
     if (transform !== init) {
@@ -99,14 +128,20 @@ export async function onClickNextBtn (datepick: any, direct = false) {
     }
   }
 
-  if (datepick.options.afterEffect && typeof datepick.options.afterEffect === 'function') {
+  if (
+    datepick.options.afterEffect
+    && typeof datepick.options.afterEffect === 'function'
+  ) {
     await datepick.options.afterEffect(datepick, 'next');
   }
 }
 
-// For the picker's main block to delegete the events from `datepick-cell`s
-export async function onClickView (datepick: any, event: any) {
-  if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.view.classList.contains('panning')) {
+export async function onClickView (datepick: any, event: any): Promise<boolean> {
+  if (
+    datepick.views.view.classList.contains('effect')
+    || datepick.views.view.classList.contains('loading')
+    || datepick.views.view.classList.contains('panning')
+  ) {
     return false;
   }
 
@@ -114,12 +149,21 @@ export async function onClickView (datepick: any, event: any) {
   const target = findElementInEventPath(event, '.datepick-cell');
 
   // Cancel if disabled
-  if (!target || target.classList.contains('disabled') || target.classList.contains('hide') || target.dataset.date < datepick.options.minDate || target.dataset.date > datepick.options.maxDate) {
+  if (
+    !target
+    || target.classList.contains('disabled')
+    || target.classList.contains('hide')
+    || target.dataset.date < datepick.options.minDate
+    || target.dataset.date > datepick.options.maxDate
+  ) {
     return false;
   }
 
   // Before Click event
-  if (datepick.options.beforeClickDay && typeof datepick.options.beforeClickDay === 'function') {
+  if (
+    datepick.options.beforeClickDay
+    && typeof datepick.options.beforeClickDay === 'function'
+  ) {
     await datepick.options.beforeClickDay(datepick);
   }
 
@@ -127,12 +171,15 @@ export async function onClickView (datepick: any, event: any) {
   datepick.setDate(Number(target.dataset.date));
 
   // After Click event
-  if (datepick.options.afterClickDay && typeof datepick.options.afterClickDay === 'function') {
+  if (
+    datepick.options.afterClickDay
+    && typeof datepick.options.afterClickDay === 'function'
+  ) {
     await datepick.options.afterClickDay(datepick, datepick.dates);
   }
 }
 
-export function onClickPicker(event: any) {
+export function onClickPicker (event: any): void {
   event.preventDefault();
   event.stopPropagation();
 }

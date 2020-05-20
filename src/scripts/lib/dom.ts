@@ -1,52 +1,52 @@
-export function parseHTML (html: any) {
+export function parseHTML (html: string): DocumentFragment {
   const range = document.createRange();
+
   return range.createContextualFragment(html);
 }
 
-export function emptyChildNodes (el: any) {
-  if (el.firstChild) {
-    el.removeChild(el.firstChild);
-    emptyChildNodes(el);
+export function emptyChildNodes (element: any): void {
+  if (element.firstChild) {
+    element.removeChild(element.firstChild);
+    emptyChildNodes(element);
   }
 }
 
-export function replaceChildNodes (el: any, newChildNodes: any) {
-  emptyChildNodes (el);
+export function replaceChildNodes (element: any, newChildNodes: any): void {
+  emptyChildNodes (element);
 
   if (newChildNodes) {
-    el.appendChild(newChildNodes);
+    element.appendChild(newChildNodes);
   } else if (typeof newChildNodes === 'string') {
-    el.appendChild(parseHTML(newChildNodes));
+    element.appendChild(parseHTML(newChildNodes));
   } else if (typeof newChildNodes.forEach === 'function') {
     newChildNodes.forEach((node: any) => {
-      el.appendChild(node);
+      element.appendChild(node);
     });
   }
 }
 
-export function hideElement (el: any) {
-  if (el.style.display === 'none') {
+export function hideElement (element: any): boolean {
+  if (element.style.display === 'none') {
     return false;
   }
 
-  // back up the existing display setting in data-style-display
-  if (el.style.display) {
-    el.dataset.styleDisplay = el.style.display;
+  if (element.style.display) {
+    element.dataset.styleDisplay = element.style.display;
   }
 
-  el.style.display = 'none';
+  element.style.display = 'none';
 }
 
-export function showElement (el: any) {
-  if (el.style.display !== 'none') {
+export function showElement (element: any): boolean {
+  if (element.style.display !== 'none') {
     return false;
   }
 
-  if (el.dataset.styleDisplay) {
-    // restore backed-up dispay property
-    el.style.display = el.dataset.styleDisplay;
-    delete el.dataset.styleDisplay;
+  if (element.dataset.styleDisplay) {
+    element.style.display = element.dataset.styleDisplay;
+
+    delete element.dataset.styleDisplay;
   } else {
-    el.style.display = '';
+    element.style.display = '';
   }
 }

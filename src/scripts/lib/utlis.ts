@@ -1,12 +1,12 @@
-export function hasProperty (obj, prop) {
+export function hasProperty (obj: object, prop: string): any {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-export function lastItemOf (arr) {
+export function lastItemOf (arr: Array<any>): any {
   return arr[arr.length - 1];
 }
 
-export function createTagRepeat (tagName, repeat, index = 0, html = '') {
+export function createTagRepeat (tagName: string, repeat: number, index = 0, html = ''): string {
   html += `<${tagName}></${tagName}>`;
 
   const next = index + 1;
@@ -16,18 +16,18 @@ export function createTagRepeat (tagName, repeat, index = 0, html = '') {
     : html;
 }
 
-export function optimizeTemplateHTML (html) {
+export function optimizeTemplateHTML (html: string): string {
   return html.replace(/>\s+/g, '>').replace(/\s+</, '<');
 }
 
-export function isInRange (testVal, min, max) {
-  const minOK = min === undefined || testVal >= min;
-  const maxOK = max === undefined || testVal <= max;
+export function isInRange (val: number, min: number, max: number): boolean {
+  const minOK = min === undefined || val >= min;
+  const maxOK = max === undefined || val <= max;
 
   return minOK && maxOK;
 }
 
-export function limitToRange (val, min, max) {
+export function limitToRange (val: number, min: number, max: number): number {
   if (val < min) {
     return min;
   }
@@ -39,10 +39,10 @@ export function limitToRange (val, min, max) {
   return val;
 }
 
-export function deepCopy (obj: object) {
+export function deepCopy (obj: object): object {
   const clone = {};
 
-  for (let i in obj) {
+  for (const i in obj) {
     if (typeof obj[i] === 'function') {
       clone[i] = obj[i];
     } else if (Array.isArray(obj[i])) {

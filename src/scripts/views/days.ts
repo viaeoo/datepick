@@ -75,15 +75,18 @@ export default class Days {
     }
 
     if (options.grid > 1) {
-      this.active = Math.round(options.grid / 2);
+      this.active = Math.floor(options.grid / 2);
     }
 
     Array.from(this.week.children).forEach((el: any, index) => {
       const dow = index % 7;
+
       el.textContent = days[dow];
       el.className = 'dow';
 
-      if (options.dowClass) {
+      if (
+        options.dowClass
+      ) {
         el.className += ` ${options.dowClass}`;
       }
     });
@@ -262,7 +265,7 @@ export default class Days {
       this.updateActive();
       this.updateView();
     } else {
-      const gridNum = Math.round(this.datepick.options.grid / 2);
+      const gridNum = Math.floor(this.datepick.options.grid / 2);
       Array.prototype.forEach.call(this.grid, (target, index) => {
         firstDate = new Date(addMonths(this.first, index - gridNum));
         firstDateTime = getTime(firstDate);

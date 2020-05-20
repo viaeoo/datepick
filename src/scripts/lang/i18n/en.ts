@@ -8,4 +8,4 @@ export const en = {
   format: 'yyyy-mm-dd',
   titleFormat: 'yyyy.mm',
   dowFormat: 'D',
-}
+};
