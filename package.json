@@ -2,7 +2,8 @@
   "name": "datepick",
   "version": "0.0.3",
   "description": "Date Picker Calendar",
-  "main": "index.js",
+  "main": "datepick.ts",
+  "types": "datepick.d.ts",
   "scripts": {
     "build:dev": "webpack",
     "build:prod": "cross-env NODE_ENV=production webpack",
@@ -46,6 +47,7 @@
     "babel-preset-minify": "^0.5.1",
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
+    "dts-bundle": "^0.7.3",
     "eslint": "^6.8.0",
     "eslint-loader": "^4.0.2",
     "file-loader": "^6.0.0",
