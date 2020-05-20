@@ -11,7 +11,7 @@ function padZero (num: number, length: number): string {
   return num.toString().padStart(length, '0');
 }
 
-function normalizeMonth (monthIndex): any {
+function normalizeMonth (monthIndex: number): any {
   return monthIndex > -1
     ? monthIndex % 12 :
     normalizeMonth(monthIndex + 12);

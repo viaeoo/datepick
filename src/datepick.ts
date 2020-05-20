@@ -1,6 +1,9 @@
 // Style
 import './datepick.scss';
 
+// Polyfills
+import './scripts/polyfills/composedPath';
+
 // Options
 import defalutOptions from './scripts/options/defaultOptions';
 
