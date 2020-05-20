@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 const getPackageJson = require('./script/getPackageJson');
@@ -30,6 +31,24 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   outputFile = `${name}.js`;
 }
+
+const DtsBundlePlugin = function () {};
+DtsBundlePlugin.prototype.apply = function (compiler) {
+  compiler.plugin('done', function () {
+    const dts = require('dts-bundle');
+
+    dts.bundle({
+      name: name.replace(/^./, name[0].toUpperCase()),
+      main: './dist/**/*.d.ts',
+      out: `${name}.d.ts`,
+      removeSource: true,
+      outputAsModuleFolder: true,
+      headerText: banner,
+    });
+
+    fs.rmdirSync('./dist/scripts', { recursive: true });
+  });
+};
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -108,5 +127,6 @@ module.exports = {
       filename: process.env.NODE_ENV === 'production' ? `${name}.min.css` : `${name}.css`,
     }),
     new StyleLintPlugin(),
+    new DtsBundlePlugin(),
   ],
 };
