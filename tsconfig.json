@@ -7,7 +7,6 @@
     "allowJs": true,
     "removeComments": true,
     "declaration": true,
-    "declarationDir": "./dist/types",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
