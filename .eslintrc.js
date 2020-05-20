@@ -5,29 +5,19 @@ module.exports = {
     node: true,
     es6: true,
   },
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    parser: 'babel-eslint',
     sourceType: 'module',
     ecmaVersion: 2018,
   },
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   rules: {
     'linebreak-style': [
       'error',
       'unix',
-    ],
-    'indent': [
-      'error',
-      2
-    ],
-    'key-spacing': [
-      'error',
-      {
-        beforeColon: false,
-        afterColon: true,
-      },
     ],
     'keyword-spacing': [
       'error',
@@ -55,10 +45,6 @@ module.exports = {
       'error',
       'always',
     ],
-    'space-in-parens': [
-      'error',
-      'never',
-    ],
     'space-before-function-paren': [
       'error',
       'always',
@@ -67,39 +53,23 @@ module.exports = {
       'error',
       'single',
     ],
-    'comma-dangle': [
-      'error',
-      'always-multiline',
-    ],
-    'linebreak-style': [
-      'error',
-      'unix',
-    ],
-    'eqeqeq': [
-      'error',
-      'allow-null',
-    ],
     'one-var': [
       'error',
       'never',
     ],
     'semi': [
       'error',
-      'always'
+      'always',
     ],
-    'no-return-assign': 'off',
-    'no-unused-expressions': 'off',
-    'no-trailing-spaces': 'error',
+    'multiline-ternary': [
+      'error',
+      'always-multiline',
+    ],
     'no-useless-escape': 'off',
-    'no-useless-catch': 'off',
-    'new-cap': 'off',
-    'no-async-promise-executor': 'off',
-    'no-new': 'off',
-    'import/namespace': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-undef': 'off',
-    'no-empty': 'off',
-    'no-global-assign': 'off'
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
   }
 }
