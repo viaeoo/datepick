@@ -2,7 +2,7 @@ import { today } from '../lib/date';
 import { findElementInEventPath } from '../lib/event';
 import { fade, swipe } from './effects';
 
-export function onClickTodayBtn (datepick) {
+export function onClickTodayBtn (datepick: any) {
   try {
     datepick.setDate(today(), { today: true });
 
@@ -12,13 +12,13 @@ export function onClickTodayBtn (datepick) {
   } catch (err) {}
 }
 
-export function onClickClearBtn (datepick) {
+export function onClickClearBtn (datepick: any) {
   try {
     datepick.setDate(null, { clear: true });
   } catch (err) {}
 }
 
-export async function onClickPrevBtn (datepick, direct = false) {
+export async function onClickPrevBtn (datepick: any, direct = false) {
   if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.first <= datepick.options.minDate) {
     return false;
   }
@@ -46,7 +46,7 @@ export async function onClickPrevBtn (datepick, direct = false) {
   datepick.views.view.classList.remove('effect');
 
   if (direct && datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade' && datepick.options.grid > 1 && datepick.options.touchEvent) {
-    const init = parseInt(datepick.options.grid / 2) * 100;
+    const init = Math.round(datepick.options.grid / 2) * 100;
     const transform = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
 
     if (transform !== init) {
@@ -61,7 +61,7 @@ export async function onClickPrevBtn (datepick, direct = false) {
   }
 }
 
-export async function onClickNextBtn (datepick, direct = false) {
+export async function onClickNextBtn (datepick: any, direct = false) {
   if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.last >= datepick.options.maxDate) {
     return false;
   }
@@ -89,7 +89,7 @@ export async function onClickNextBtn (datepick, direct = false) {
   datepick.views.view.classList.remove('effect');
 
   if (direct && datepick.options.mode !== 'swipe' && datepick.options.mode !== 'fade' && datepick.options.grid > 1 && datepick.options.touchEvent) {
-    const init = parseInt(datepick.options.grid / 2) * 100;
+    const init = Math.round(datepick.options.grid / 2) * 100;
     const transform = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
 
     if (transform !== init) {
@@ -105,7 +105,7 @@ export async function onClickNextBtn (datepick, direct = false) {
 }
 
 // For the picker's main block to delegete the events from `datepick-cell`s
-export async function onClickView (datepick, event) {
+export async function onClickView (datepick: any, event: any) {
   if (datepick.views.view.classList.contains('effect') || datepick.views.view.classList.contains('loading') || datepick.views.view.classList.contains('panning')) {
     return false;
   }
@@ -132,7 +132,7 @@ export async function onClickView (datepick, event) {
   }
 }
 
-export function onClickPicker (event) {
+export function onClickPicker(event: any) {
   event.preventDefault();
   event.stopPropagation();
 }

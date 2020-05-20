@@ -1,3 +1,5 @@
+import Hammer from 'hammerjs';
+
 import { onClickPrevBtn, onClickNextBtn } from '../events/listeners';
 import { swipePlace } from '../events/effects';
 
@@ -23,8 +25,8 @@ export function onTouchGesture (datepick) {
       }
 
       const percent = datepick.options.animationDirection === 'vertical'
-        ? parseFloat((event.deltaY / datepick.container.offsetWidth) * 100)
-        : parseFloat((event.deltaX / datepick.container.offsetWidth) * 100);
+        ? Number((event.deltaY / datepick.container.offsetWidth) * 100)
+        : Number((event.deltaX / datepick.container.offsetWidth) * 100);
 
       if (percent > 5) {
         onClickPrevBtn(datepick);
@@ -61,8 +63,8 @@ export function onTouchGesture (datepick) {
       }
 
       const percent = datepick.options.animationDirection === 'vertical'
-        ? parseFloat((event.deltaY / datepick.container.offsetWidth) * 100)
-        : parseFloat((event.deltaX / datepick.container.offsetWidth) * 100);
+        ? Number((event.deltaY / datepick.container.offsetWidth) * 100)
+        : Number((event.deltaX / datepick.container.offsetWidth) * 100);
 
       const calculated = init + percent;
 
@@ -112,8 +114,8 @@ export function onTouchGesture (datepick) {
       }
 
       const percent = datepick.options.animationDirection === 'vertical'
-        ? parseFloat((event.deltaY / datepick.container.offsetWidth) * 100)
-        : parseFloat((event.deltaX / datepick.container.offsetWidth) * 100);
+        ? Number((event.deltaY / datepick.container.offsetWidth) * 100)
+        : Number((event.deltaX / datepick.container.offsetWidth) * 100);
 
       if (percent > 5) {
         onClickPrevBtn(datepick);
@@ -135,7 +137,7 @@ export function onTouchGesture (datepick) {
       ],
     });
 
-    let grid = parseInt(datepick.options.grid / 2) * -100;
+    let grid = Math.round(datepick.options.grid / 2) * -100;
     let init = null;
 
     let last = false;
@@ -155,8 +157,8 @@ export function onTouchGesture (datepick) {
       }
 
       const percent = datepick.options.animationDirection === 'vertical'
-        ? parseFloat((event.deltaY / datepick.container.offsetWidth) * 100)
-        : parseFloat((event.deltaX / datepick.container.offsetWidth) * 100);
+        ? Number((event.deltaY / datepick.container.offsetWidth) * 100)
+        : Number((event.deltaX / datepick.container.offsetWidth) * 100);
 
       let calculated = init + percent;
 

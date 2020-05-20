@@ -14,7 +14,7 @@ const defaultOptions = {
   // Range
   range: false,
   rangeIncludeDisabled: false,
-  rangeDistanceDay: null,
+  rangeDistanceDay: 0,
 
   // Multiple
   multiple: false,

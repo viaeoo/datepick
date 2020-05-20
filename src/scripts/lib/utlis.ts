@@ -39,7 +39,7 @@ export function limitToRange (val, min, max) {
   return val;
 }
 
-export function deepCopy (obj) {
+export function deepCopy (obj: object) {
   const clone = {};
 
   for (let i in obj) {

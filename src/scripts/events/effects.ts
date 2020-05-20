@@ -1,4 +1,4 @@
-export function fade (datepick, direction) {
+export function fade (datepick: any, direction: any) {
   return new Promise((resolve) => {
     const now = datepick.views.grid[datepick.views.active];
     const target = datepick.views.grid[direction === 'next' ? datepick.views.active + 1 : datepick.views.active - 1];
@@ -18,9 +18,9 @@ export function fade (datepick, direction) {
   });
 }
 
-export function swipe (datepick, direction) {
+export function swipe (datepick: any, direction: any) {
   return new Promise((resolve) => {
-    const calc = parseInt(datepick.options.grid / 2) * 100;
+    const calc = Math.round(datepick.options.grid / 2) * 100;
     const init = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
     const diff = calc - Math.abs(init - 100);
 
@@ -37,7 +37,7 @@ export function swipe (datepick, direction) {
   });
 }
 
-export function swipePlace (datepick) {
+export function swipePlace (datepick: any) {
   datepick.views.view.classList.add('effect');
 
   datepick.views.days.style.transition = `transform ${datepick.options.animationDuration}ms ${datepick.options.animationTiming}`;

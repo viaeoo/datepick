@@ -8,27 +8,50 @@ import week from '../template/week';
 import days from '../template/days';
 import grid from '../template/grid';
 
-// Extends
-import View from './view.js';
+export default class Days {
+  datepick;
 
-export default class Days extends View {
+  week;
+  days;
+  grid;
+  view;
+
+  titleFormat;
+  title;
+
+  active;
+
+  year;
+  month;
+  first;
+  last;
+  start;
+  end;
+  renderFirst;
+  renderLast;
+
+  selected;
+
   constructor (datepick) {
-    super(datepick);
+    this.datepick = datepick;
+    this.setInit();
   }
 
-  setInit (opts) {
+  setInit () {
     const { datepick } = this;
     const { options } = datepick;
 
     const weekNode = parseHTML(week(options));
     const daysNode = parseHTML(days(options));
 
+    this.view = parseHTML('<div class="datepick-view"></div>').firstChild;
     this.week = weekNode.firstChild;
     this.days = daysNode.firstChild;
 
     this.grid = [];
     for (let i = 0; i < datepick.options.grid; i++) {
-      this.grid.push(daysNode.firstChild.children[i]);
+      const node: any = daysNode.firstChild;
+      this.grid.push(node.children[i]);
     }
 
     if (!datepick.options.hideWeek) {
@@ -37,7 +60,9 @@ export default class Days extends View {
 
     this.view.appendChild(daysNode);
 
-    super.setInit(opts);
+    this.setOptions(options);
+    this.updateView();
+    this.updateSelected();
   }
 
   setOptions (options) {
@@ -50,10 +75,10 @@ export default class Days extends View {
     }
 
     if (options.grid > 1) {
-      this.active = parseInt(options.grid / 2);
+      this.active = Math.round(options.grid / 2);
     }
 
-    Array.from(this.week.children).forEach((el, index) => {
+    Array.from(this.week.children).forEach((el: any, index) => {
       const dow = index % 7;
       el.textContent = days[dow];
       el.className = 'dow';
@@ -151,7 +176,7 @@ export default class Days extends View {
     this.updateActive();
   }
 
-  renderGrid (direction) {
+  renderGrid (direction = null) {
     let maximum = null;
     let minimum = null;
 
@@ -237,7 +262,7 @@ export default class Days extends View {
       this.updateActive();
       this.updateView();
     } else {
-      const gridNum = parseInt(this.datepick.options.grid / 2);
+      const gridNum = Math.round(this.datepick.options.grid / 2);
       Array.prototype.forEach.call(this.grid, (target, index) => {
         firstDate = new Date(addMonths(this.first, index - gridNum));
         firstDateTime = getTime(firstDate);
@@ -261,7 +286,7 @@ export default class Days extends View {
   }
 
   renderCell (grid, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay }) {
-    Array.from(grid.children).forEach((ele, ind) => {
+    Array.from(grid.children).forEach((ele: any, ind) => {
       const current = addDays(startDate, ind);
       const date = new Date(current);
 
@@ -385,7 +410,7 @@ export default class Days extends View {
           ele.classList.remove('disabled', 'range', 'range-start', 'range-end', 'selected');
         });
 
-      Array.from(target.children).forEach((ele) => {
+      Array.from(target.children).forEach((ele: any) => {
         let maximum = null;
         let minimum = null;
 
@@ -418,5 +443,17 @@ export default class Days extends View {
         }
       });
     });
+  }
+
+  setViewTitle (title) {
+    this.datepick.controls.title.textContent = title;
+  }
+
+  setPrevBtnDisabled (disabled) {
+    this.datepick.controls.prevBtn.disabled = disabled;
+  }
+
+  setNextBtnDisabled (disabled) {
+    this.datepick.controls.nextBtn.disabled = disabled;
   }
 }

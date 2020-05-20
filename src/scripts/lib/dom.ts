@@ -1,16 +1,16 @@
-export function parseHTML (html) {
-  const range = document.createRange() || document.body.createRange();
+export function parseHTML (html: any) {
+  const range = document.createRange();
   return range.createContextualFragment(html);
 }
 
-export function emptyChildNodes (el) {
+export function emptyChildNodes (el: any) {
   if (el.firstChild) {
     el.removeChild(el.firstChild);
     emptyChildNodes(el);
   }
 }
 
-export function replaceChildNodes (el, newChildNodes) {
+export function replaceChildNodes (el: any, newChildNodes: any) {
   emptyChildNodes (el);
 
   if (newChildNodes) {
@@ -18,13 +18,13 @@ export function replaceChildNodes (el, newChildNodes) {
   } else if (typeof newChildNodes === 'string') {
     el.appendChild(parseHTML(newChildNodes));
   } else if (typeof newChildNodes.forEach === 'function') {
-    newChildNodes.forEach((node) => {
+    newChildNodes.forEach((node: any) => {
       el.appendChild(node);
     });
   }
 }
 
-export function hideElement (el) {
+export function hideElement (el: any) {
   if (el.style.display === 'none') {
     return false;
   }
@@ -37,7 +37,7 @@ export function hideElement (el) {
   el.style.display = 'none';
 }
 
-export function showElement (el) {
+export function showElement (el: any) {
   if (el.style.display !== 'none') {
     return false;
   }

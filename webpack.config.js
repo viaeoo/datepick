@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  entry: './src/datepick.js',
+  entry: './src/datepick.ts',
   output: {
     filename: outputFile,
     path: path.resolve(__dirname, 'dist'),
@@ -45,11 +45,10 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.tsx?$/,
         exclude: /(node_modules|bower_components)/,
         use: [
-          'babel-loader',
-          'eslint-loader',
+          'ts-loader',
         ],
       },
       {
@@ -88,6 +87,9 @@ module.exports = {
       '.ts',
       '.tsx',
     ],
+    alias: {
+      '@src': path.resolve(__dirname, './src/'),
+    },
   },
   devServer: {
     host: '127.0.0.1',
@@ -98,11 +100,13 @@ module.exports = {
     clientLogLevel: 'none',
   },
   plugins: [
-    new webpack.BannerPlugin(banner),
-    new webpack.ProvidePlugin({
-      Hammer: 'hammerjs',
+    new webpack.BannerPlugin({
+      banner: banner,
+      entryOnly: true,
     }),
-    new MiniCssExtractPlugin({ filename: process.env.NODE_ENV === 'production' ? `${name}.min.css` : `${name}.css` }),
+    new MiniCssExtractPlugin({
+      filename: process.env.NODE_ENV === 'production' ? `${name}.min.css` : `${name}.css`,
+    }),
     new StyleLintPlugin(),
   ],
 };
