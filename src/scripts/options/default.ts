@@ -1,4 +1,6 @@
-const defaultOptions = {
+import { Options } from '../interface/options';
+
+const defaultOption: Options = {
   // Basic
   grid: 1,
   today: null,
@@ -95,4 +97,4 @@ const defaultOptions = {
   afterEffect: null,
 };
 
-export default defaultOptions;
+export default defaultOption;

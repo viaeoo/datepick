@@ -4,8 +4,11 @@ import './datepick.scss';
 // Polyfills
 import './scripts/polyfills/composedPath';
 
+// Interface
+import { Options } from './scripts/interface/options';
+
 // Options
-import defalutOptions from './scripts/options/defaultOptions';
+import defaultOption from './scripts/options/default';
 
 // Lib
 import { parseHTML, showElement, hideElement, emptyChildNodes } from './scripts/lib/dom';
@@ -28,22 +31,22 @@ import wrapper from './scripts/template/wrapper';
 import Days from './scripts/views/days';
 
 class Datepick {
-  element: Element;
-  options: any;
+  public element: Element;
+  public options: Options;
 
-  dates: Array<Date|number>;
-  viewDate: Date|number;
+  public dates: Array<Date|number>;
+  public viewDate: Date|number;
 
-  container: Element;
-  main: Element;
-  controls: Record<string, any>;
-  views: any;
+  public container: Element;
+  public main: Element;
+  public controls: Record<string, any>;
+  public views: any;
 
-  active: boolean;
+  public active: boolean;
 
-  constructor (element: Element, options: Record<string, any>) {
+  constructor (element: Element, options: Options) {
     this.element = element;
-    this.options = deepCopy({ ...deepCopy(defalutOptions), ...options });
+    this.options = deepCopy({ ...options, ...defaultOption });
     this.dates = [];
 
     this.setInit();
@@ -51,21 +54,16 @@ class Datepick {
     this.show();
   }
 
-  // Set init
   setInit () {
     // Set initial date
-    if (
-      !this.options.initialDate
-    ) {
+    if (!this.options.initialDate) {
       this.options.initialDate = today();
     } else if (
       !(this.options.initialDate instanceof Array) &&
       !isDate(this.options.initialDate)
     ) {
       throw new Error('Invalid initialDate');
-    } else if (
-      this.options.initialDate instanceof Array
-    ) {
+    } else if (this.options.initialDate instanceof Array) {
       this.options.initialDate.map((date: Date|number) => {
         if (!isDate(date)) {
           throw new Error('Invalid initialDate');
@@ -86,7 +84,7 @@ class Datepick {
       this.options.locale &&
       Object.keys(this.options.locale).length
     ) {
-      this.options.locale = deepCopy({ ...deepCopy(locale[this.options.lang]), ...this.options.locale });
+      this.options.locale = deepCopy({ ...locale[this.options.lang], ...this.options.locale });
     } else {
       this.options.locale = deepCopy(locale[this.options.lang]);
     }
@@ -96,18 +94,12 @@ class Datepick {
       !this.options.dates ||
       !(this.options.dates instanceof Array)
     ) {
-      if (
-        this.options.initialDate instanceof Array
-      ) {
-        if (
-          this.options.range
-        ) {
+      if (this.options.initialDate instanceof Array) {
+        if (this.options.range) {
           this.dates = this.options.initialDate.length > 1
             ? [ getTime(this.options.initialDate[0]), getTime(this.options.initialDate[1]) ]
             : [ getTime(this.options.initialDate[0]), addDays(getTime(this.options.initialDate[0]), 1) ];
-        } else if (
-          this.options.multiple
-        ) {
+        } else if (this.options.multiple) {
           this.dates = this.options.multipleMaximum !== 0
             ? this.options.initialDate.slice(0, this.options.multipleMaximum)
             : this.options.initialDate.map((date) => { return getTime(date); });
@@ -115,16 +107,12 @@ class Datepick {
           this.dates.push(this.options.initialDate[0]);
         }
       } else {
-        if (
-          this.options.range
-        ) {
+        if (this.options.range) {
           this.dates = [
             getTime(this.options.initialDate),
             addDays(getTime(this.options.initialDate), 1),
           ];
-        } else if (
-          this.options.multiple
-        ) {
+        } else if (this.options.multiple) {
           this.dates.push(getTime(this.options.initialDate));
         } else {
           this.dates.push(getTime(this.options.initialDate));
@@ -149,9 +137,7 @@ class Datepick {
       typeof this.options.grid === 'number' &&
       this.options.grid !== 1
     ) {
-      if (
-        this.options.grid % 2 !== 1
-      ) {
+      if (this.options.grid % 2 !== 1) {
         throw new Error('Grid option can only be odd');
       }
 
@@ -181,9 +167,7 @@ class Datepick {
     let minDt = this.options.minDate;
     let maxDt = this.options.maxDate;
 
-    if (
-      this.options.minDate !== undefined
-    ) {
+    if (this.options.minDate !== undefined) {
       minDt = this.options.minDate === null
         ? dateValue(0, 0, 1)
         : this.validateDate(this.options.minDate, this.options.locale.format, this.options.locale, minDt);
@@ -191,9 +175,7 @@ class Datepick {
       delete this.options.minDate;
     }
 
-    if (
-      this.options.maxDate !== undefined
-    ) {
+    if (this.options.maxDate !== undefined) {
       maxDt = this.options.maxDate === null
         ? undefined
         : this.validateDate(this.options.maxDate, this.options.locale.format, this.options.locale, maxDt);
@@ -234,10 +216,8 @@ class Datepick {
     this.controls = controls;
 
     // Add wrapper class
-    if (
-      this.options.wrapperClass
-    ) {
-      container.classList.add(this.options.wrapperClass);
+    if (this.options.containerClass) {
+      container.classList.add(this.options.containerClass);
     }
 
     if (
@@ -344,9 +324,7 @@ class Datepick {
 
     const setDateOptions = { ...{ clear: false, render: true }, ...opts };
 
-    if (
-      setDateOptions.clear
-    ) {
+    if (setDateOptions.clear) {
       this.dates = [];
     } else {
       const newDate = isInRange(date instanceof Date ? date.getTime() : date, minDate, maxDate)
