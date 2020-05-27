@@ -1,6 +1,7 @@
+import { Options } from '../interface/options';
 import { optimizeTemplateHTML } from '../lib/utlis';
 
-const wrapper = (options: any) => {
+const wrapper = (options: Options) => {
   return optimizeTemplateHTML(`
     <div class="datepick${options.containerClass ? ` ${options.containerClass}` : ''}">
       <div class="datepick-header${options.headerClass ? ` ${options.headerClass}` : ''}">

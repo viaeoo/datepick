@@ -1,11 +1,3 @@
-export function hasProperty (obj: object, prop: string): any {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-export function lastItemOf (arr: Array<any>): any {
-  return arr[arr.length - 1];
-}
-
 export function createTagRepeat (tagName: string, repeat: number, index = 0, html = ''): string {
   html += `<${tagName}></${tagName}>`;
 

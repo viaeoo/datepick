@@ -1,5 +1,4 @@
 import { getTime, today } from './date';
-import { lastItemOf } from './utlis';
 
 // pattern for format parts
 export const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
@@ -142,7 +141,7 @@ function parseFormatString (format: string): any {
         return str += `${separators[index]}${fn(date, locale)}`;
       }, '');
 
-      return dateStr += lastItemOf(separators);
+      return dateStr += separators[separators.length - 1];
     },
   };
 }

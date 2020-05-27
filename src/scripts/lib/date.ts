@@ -1,7 +1,3 @@
-export function isDate (date: Date|number): boolean {
-  return date instanceof Date;
-}
-
 export function getTime (date: Date|number): number {
   return new Date(date).setHours(0, 0, 0, 0);
 }
@@ -63,17 +59,4 @@ export function dayOfTheWeekOf (baseDate: Date|number, dayOfWeek: number, weekSt
   const baseDay = new Date(baseDate).getDay();
 
   return addDays(baseDate, dayDiff(dayOfWeek, weekStart) - dayDiff(baseDay, weekStart));
-}
-
-export function getWeek (date: Date|number): number {
-  const thuOfTheWeek = dayOfTheWeekOf (date, 4, 1);
-  const firstThu = dayOfTheWeekOf(new Date(thuOfTheWeek).setMonth(0, 4), 4, 1);
-
-  return Math.floor((thuOfTheWeek - firstThu) / 604800000) + 1;
-}
-
-export function startOfYearPeriod (date: Date|number, years: number): number {
-  const year = new Date(date).getFullYear();
-
-  return Math.floor(year / years) * years;
 }

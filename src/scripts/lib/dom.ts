@@ -11,20 +11,6 @@ export function emptyChildNodes (element: any): void {
   }
 }
 
-export function replaceChildNodes (element: any, newChildNodes: any): void {
-  emptyChildNodes (element);
-
-  if (newChildNodes) {
-    element.appendChild(newChildNodes);
-  } else if (typeof newChildNodes === 'string') {
-    element.appendChild(parseHTML(newChildNodes));
-  } else if (typeof newChildNodes.forEach === 'function') {
-    newChildNodes.forEach((node: any) => {
-      element.appendChild(node);
-    });
-  }
-}
-
 export function hideElement (element: any): boolean {
   if (element.style.display === 'none') {
     return false;

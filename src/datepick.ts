@@ -6,14 +6,15 @@ import './scripts/polyfills/composedPath';
 
 // Interface
 import { Options } from './scripts/interface/options';
+import { Locale } from './scripts/interface/locale';
 
 // Options
 import defaultOption from './scripts/options/default';
 
 // Lib
 import { parseHTML, showElement, hideElement, emptyChildNodes } from './scripts/lib/dom';
-import { isDate, getTime, today, addDays, dateValue } from './scripts/lib/date';
-import { limitToRange, isInRange, hasProperty, deepCopy } from './scripts/lib/utlis';
+import { getTime, today, addDays, dateValue } from './scripts/lib/date';
+import { limitToRange, isInRange, deepCopy } from './scripts/lib/utlis';
 import { registerListeners } from './scripts/lib/event';
 import { formatDate, parseDate } from './scripts/lib/format';
 import { onTouchGesture } from './scripts/lib/gesture';
@@ -39,7 +40,7 @@ class Datepick {
 
   public container: Element;
   public main: Element;
-  public controls: Record<string, any>;
+  public controls: Record<string, Element>;
   public views: any;
 
   public active: boolean;
@@ -59,13 +60,13 @@ class Datepick {
     if (!this.options.initialDate) {
       this.options.initialDate = today();
     } else if (
-      !(this.options.initialDate instanceof Array) &&
-      !isDate(this.options.initialDate)
+      !(this.options.initialDate instanceof Array)
+      && !(this.options.initialDate instanceof Date)
     ) {
       throw new Error('Invalid initialDate');
     } else if (this.options.initialDate instanceof Array) {
       this.options.initialDate.map((date: Date|number) => {
-        if (!isDate(date)) {
+        if (!(date instanceof Date)) {
           throw new Error('Invalid initialDate');
         }
       });
@@ -73,16 +74,16 @@ class Datepick {
 
     // Set today
     if (
-      this.options.today ||
-      !isDate(this.options.today)
+      this.options.today
+      || !(this.options.today instanceof Date)
     ) {
       this.options.today = today();
     }
 
     // Set locale
     if (
-      this.options.locale &&
-      Object.keys(this.options.locale).length
+      this.options.locale
+      && Object.keys(this.options.locale).length
     ) {
       this.options.locale = deepCopy({ ...locale[this.options.lang], ...this.options.locale });
     } else {
@@ -91,8 +92,8 @@ class Datepick {
 
     // Set dates
     if (
-      !this.options.dates ||
-      !(this.options.dates instanceof Array)
+      !this.options.dates
+      || !(this.options.dates instanceof Array)
     ) {
       if (this.options.initialDate instanceof Array) {
         if (this.options.range) {
@@ -120,8 +121,8 @@ class Datepick {
       }
     } else {
       if (
-        (this.options.range && this.options.dates.length > 2) ||
-        ((!this.options.range && !this.options.multiple) && this.options.dates.length > 1)
+        (this.options.range && this.options.dates.length > 2)
+        || ((!this.options.range && !this.options.multiple) && this.options.dates.length > 1)
       ) {
         throw new Error('Invalid dates length');
       }
@@ -133,24 +134,24 @@ class Datepick {
 
     // Set grid
     if (
-      this.options.grid &&
-      typeof this.options.grid === 'number' &&
-      this.options.grid !== 1
+      this.options.grid
+      && typeof this.options.grid === 'number'
+      && this.options.grid !== 1
     ) {
       if (this.options.grid % 2 !== 1) {
         throw new Error('Grid option can only be odd');
       }
 
       if (
-        this.options.grid < 3 &&
-        (this.options.mode === 'swipe' || this.options.mode === 'fade')
+        this.options.grid < 3
+        && (this.options.mode === 'swipe' || this.options.mode === 'fade')
       ) {
         throw new Error('If Swipe or fade mode, Grid options is only values ​​greater than 3 are possible');
       }
     } else {
       if (
-        this.options.mode === 'swipe' ||
-        this.options.mode === 'fade'
+        this.options.mode === 'swipe'
+        || this.options.mode === 'fade'
       ) {
         this.options.grid = 3;
       } else {
@@ -183,31 +184,26 @@ class Datepick {
       delete this.options.maxDate;
     }
 
-    if (
-      maxDt < minDt
-    ) {
+    if (maxDt < minDt) {
       this.options.minDate = maxDt;
       this.options.maxDate = minDt;
     } else {
-      if (
-        this.options.minDate !== minDt
-      ) {
+      if (this.options.minDate !== minDt) {
         this.options.minDate = this.options.minDate = minDt;
       }
 
-      if (
-        this.options.maxDate !== maxDt
-      ) {
+      if (this.options.maxDate !== maxDt) {
         this.options.maxDate = this.options.maxDate = maxDt;
       }
     }
   }
 
   render (wrapper: string, listeners: any) {
-    const container: any = parseHTML(wrapper).firstChild;
-    const [ header, main, footer ] = container.childNodes;
-    const [ prevBtn, title, nextBtn ] = header.lastElementChild.children;
-    const [ todayBtn, clearBtn ] = footer.firstChild.children;
+    const container = parseHTML(wrapper).firstElementChild;
+
+    const [ header, main, footer ] = Array.from(container.children);
+    const [ prevBtn, title, nextBtn ] = Array.from(header.lastElementChild.children);
+    const [ todayBtn, clearBtn ] = Array.from(footer.firstElementChild.children);
     const controls = { prevBtn, title, nextBtn, todayBtn, clearBtn };
 
     // Property
@@ -221,16 +217,16 @@ class Datepick {
     }
 
     if (
-      this.options.mode &&
-      typeof this.options.mode === 'string' &&
-      (this.options.mode === 'swipe' || this.options.mode === 'fade')
+      this.options.mode
+      && typeof this.options.mode === 'string'
+      && (this.options.mode === 'swipe' || this.options.mode === 'fade')
     ) {
       container.classList.add(this.options.mode);
     }
 
     if (
-      this.options.animationDirection &&
-      typeof this.options.animationDirection === 'string'
+      this.options.animationDirection
+      && typeof this.options.animationDirection === 'string'
     ) {
       container.classList.add(this.options.animationDirection);
     }
@@ -256,9 +252,7 @@ class Datepick {
     this.views.render();
 
     // If swipe mode
-    if (
-      this.options.mode === 'swipe'
-    ) {
+    if (this.options.mode === 'swipe') {
       this.views.days.style.transform = this.options.animationDirection === 'vertical'
         ? `translateY(-${Math.floor(this.options.grid / 2) * 100}%)`
         : `translateX(-${Math.floor(this.options.grid / 2) * 100}%)`;
@@ -266,9 +260,9 @@ class Datepick {
 
     // If default mode & grid > 1
     if (
-      this.options.mode !== 'fade' &&
-      this.options.mode !== 'swipe' &&
-      this.options.grid > 1
+      this.options.mode !== 'fade'
+      && this.options.mode !== 'swipe'
+      && this.options.grid > 1
     ) {
       this.views.days.style.transform = this.options.animationDirection === 'vertical'
         ? `translateY(-${Math.floor(this.options.grid / 2) * 100}%)`
@@ -286,9 +280,7 @@ class Datepick {
   }
 
   show () {
-    if (
-      this.active
-    ) {
+    if (this.active) {
       return;
     }
 
@@ -304,21 +296,16 @@ class Datepick {
       ? (date: Date|number) => formatDate(date, format, locale)
       : (date: Date|number) => new Date(date);
 
-    if (
-      range ||
-      multiple
-    ) {
+    if (range || multiple) {
       return this.dates.map(callback);
     }
 
-    if (
-      dates.length > 0
-    ) {
+    if (dates.length > 0) {
       return callback(dates[0]);
     }
   }
 
-  setDate (date: Date|number, opts: any) {
+  setDate (date: Date|number, opts: Options) {
     const { options, dates } = this;
     const { minDate, maxDate, locale, range, multiple } = options;
 
@@ -339,23 +326,20 @@ class Datepick {
         const max = Math.max.apply(null, dates);
 
         if (
-          getTime(newDate) === getTime(today()) && setDateOptions.today
+          getTime(newDate) === getTime(today())
+          && setDateOptions.today
         ) {
           this.dates = [ newDate, addDays(newDate, 1) ];
-        } else if (
-          !dates.length
-        ) {
+        } else if (!dates.length) {
           this.dates.push(newDate);
-        } else if (
-          dates.length === 2
-        ) {
+        } else if (dates.length === 2) {
           this.dates = [];
           this.dates.push(newDate);
         } else {
           if (
-            newDate === dates[0] &&
-            options.isClickDayEqual &&
-            typeof options.isClickDayEqual === 'function'
+            newDate === dates[0]
+            && options.isClickDayEqual
+            && typeof options.isClickDayEqual === 'function'
           ) {
             options.isClickDayEqual(this);
 
@@ -363,8 +347,8 @@ class Datepick {
           }
 
           if (
-            !options.rangeIncludeDisabled &&
-            options.disabledDate.length
+            !options.rangeIncludeDisabled
+            && options.disabledDate.length
           ) {
             const newArr = this.dates.concat([ newDate ]);
             const newMax = Math.max.apply(null, newArr);
@@ -400,7 +384,13 @@ class Datepick {
         const isInclude = this.dates.includes(newDate);
 
         if (isInclude) {
-          if (!setDateOptions.today && dates.length === 1 && newDate === dates[0] && options.isClickDayEqual && typeof options.isClickDayEqual === 'function') {
+          if (
+            !setDateOptions.today
+            && dates.length === 1
+            && newDate === dates[0]
+            && options.isClickDayEqual
+            && typeof options.isClickDayEqual === 'function'
+          ) {
             options.isClickDayEqual(this);
 
             return false;
@@ -412,10 +402,16 @@ class Datepick {
             });
           }
         } else {
-          if (typeof options.multipleMaximum === 'number' && (options.multipleMaximum === 0 || options.multipleMaximum > dates.length)) {
+          if (
+            typeof options.multipleMaximum === 'number'
+            && (options.multipleMaximum === 0 || options.multipleMaximum > dates.length)
+          ) {
             this.dates.push(newDate);
           } else {
-            if (options.isClickMultipleMaximum && typeof options.isClickMultipleMaximum === 'function') {
+            if (
+              options.isClickMultipleMaximum
+              && typeof options.isClickMultipleMaximum === 'function'
+            ) {
               options.isClickMultipleMaximum(this);
 
               return false;
@@ -423,10 +419,18 @@ class Datepick {
           }
         }
       } else {
-        if (!dates[0] || newDate !== dates[0] || (getTime(newDate) === getTime(today()) && setDateOptions.today)) {
+        if (
+          !dates[0]
+          || newDate !== dates[0]
+          || (getTime(newDate) === getTime(today()) && setDateOptions.today)
+        ) {
           this.dates = [ newDate ];
         } else {
-          if (newDate === dates[0] && options.isClickDayEqual && typeof options.isClickDayEqual === 'function') {
+          if (
+            newDate === dates[0]
+            && options.isClickDayEqual
+            && typeof options.isClickDayEqual === 'function'
+          ) {
             options.isClickDayEqual(this);
 
             return false;
@@ -449,15 +453,18 @@ class Datepick {
     return limitToRange(viewDate instanceof Date ? viewDate.getTime() : viewDate, minDate, maxDate);
   }
 
-  private validateDate (value, format, locale, origValue) {
+  private validateDate (value: Date|number, format: string, locale: Locale, originValue: Date|number) {
     const date = parseDate(value, format, locale);
 
-    return date !== undefined ? date : origValue;
+    return date !== undefined ? date : originValue;
   }
 
-  private renderSetting (datepick, options) {
+  private renderSetting (datepick: this, options: Options) {
     // Set prev btn
-    if (options.prevBtnText && typeof options.prevBtnText === 'string') {
+    if (
+      options.prevBtnText
+      && typeof options.prevBtnText === 'string'
+    ) {
       const prevBtn = datepick.controls.prevBtn;
       const prevBtnNode = parseHTML(options.prevBtnText);
 
@@ -513,9 +520,15 @@ class Datepick {
     }
 
     // Set today btn disabeld
-    if (hasProperty(options, 'minDate') || hasProperty(options, 'maxDate')) {
+    if (
+      Object.prototype.hasOwnProperty.call(options, 'minDate')
+      || Object.prototype.hasOwnProperty.call(options, 'maxDate')
+    ) {
       const { minDate, maxDate } = options;
-      datepick.controls.todayBtn.disabled = !isInRange(today(), minDate, maxDate);
+
+      !isInRange(today(), minDate, maxDate)
+        ? datepick.controls.todayBtn.setAttribute('disabled', '')
+        : datepick.controls.todayBtn.removeAttribute('disabled');
     }
   }
 }

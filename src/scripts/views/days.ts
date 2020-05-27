@@ -9,12 +9,12 @@ import days from '../template/days';
 import grid from '../template/grid';
 
 export default class Days {
-  datepick;
+  public datepick;
 
-  week;
-  days;
+  public view: Element;
+  public week: Element;
+  public days: Element;
   grid;
-  view;
 
   titleFormat;
   title;
@@ -44,9 +44,9 @@ export default class Days {
     const weekNode = parseHTML(week(options));
     const daysNode = parseHTML(days(options));
 
-    this.view = parseHTML('<div class="datepick-view"></div>').firstChild;
-    this.week = weekNode.firstChild;
-    this.days = daysNode.firstChild;
+    this.view = parseHTML('<div class="datepick-view"></div>').firstElementChild;
+    this.week = weekNode.firstElementChild;
+    this.days = daysNode.firstElementChild;
 
     this.grid = [];
     for (let i = 0; i < datepick.options.grid; i++) {
