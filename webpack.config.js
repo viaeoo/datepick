@@ -51,7 +51,7 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
 };
 
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'none',
   entry: './src/datepick.ts',
   output: {
     filename: outputFile,
