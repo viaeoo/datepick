@@ -1,3 +1,6 @@
+// Interface
+import { Options } from '../../scripts/interface/options';
+
 // Lib
 import { today, dateValue, addDays, addMonths, dayOfTheWeekOf, getTime } from '../lib/date';
 import { formatDate } from '../lib/format';
@@ -9,30 +12,30 @@ import days from '../template/days';
 import grid from '../template/grid';
 
 export default class Days {
-  public datepick;
+  public datepick: any;
 
   public view: Element;
   public week: Element;
   public days: Element;
-  grid;
+  public grid: Array<Element>;
 
-  titleFormat;
-  title;
+  public titleFormat: string;
+  public title: string;
 
-  active;
+  public active: number;
 
-  year;
-  month;
-  first;
-  last;
-  start;
-  end;
-  renderFirst;
-  renderLast;
+  public year: number;
+  public month: number;
+  public first: number;
+  public last: number;
+  public start: number;
+  public end: number;
+  public renderFirst: number;
+  public renderLast: number;
 
-  selected;
+  public selected: Array<Date | number>;
 
-  constructor (datepick) {
+  constructor (datepick: any) {
     this.datepick = datepick;
     this.setInit();
   }
@@ -65,11 +68,11 @@ export default class Days {
     this.updateSelected();
   }
 
-  setOptions (options) {
-    let days = null;
+  setOptions (options: Options) {
+    let daysFormat = null;
 
     if (options.lang) {
-      days = options.locale.days;
+      daysFormat = options.locale.dowFormat === 'D' ? options.locale.daysShort : options.locale.days;
       this.titleFormat = options.locale.titleFormat;
       this.title = formatDate(this.datepick.viewDate, options.locale.titleFormat, options.locale);
     }
@@ -81,7 +84,7 @@ export default class Days {
     Array.from(this.week.children).forEach((el: any, index) => {
       const dow = index % 7;
 
-      el.textContent = days[dow];
+      el.textContent = daysFormat[dow];
       el.className = 'dow';
 
       if (
@@ -119,7 +122,7 @@ export default class Days {
     const { dates } = this.datepick;
     this.selected = dates instanceof Array
       ? dates.map((date) => { return getTime(date); })
-      : getTime(dates);
+      : [ getTime(dates) ];
   }
 
   updateControl ({ title, first, last, minDate, maxDate }) {
@@ -148,7 +151,10 @@ export default class Days {
     const { datepick, title, first, last } = this;
     const { options, renderDirection } = datepick;
 
-    if (options.beforeRender && typeof options.beforeRender === 'function') {
+    if (
+      options.beforeRender
+      && typeof options.beforeRender === 'function'
+    ) {
       await options.beforeRender(datepick, renderDirection || null);
     }
 
@@ -156,7 +162,10 @@ export default class Days {
     this.renderGrid(renderDirection);
     this.updateActive();
 
-    if (options.afterRender && typeof options.afterRender === 'function') {
+    if (
+      options.afterRender
+      && typeof options.afterRender === 'function'
+    ) {
       await options.afterRender(datepick, renderDirection || null);
     }
   }
@@ -211,18 +220,23 @@ export default class Days {
       return getTime(date);
     });
 
-    if (this.datepick.options.rangeDistanceDay && typeof this.datepick.options.rangeDistanceDay === 'number' && this.datepick.options.rangeDistanceDay > 0 && this.datepick.dates.length === 1) {
+    if (
+      this.datepick.options.rangeDistanceDay
+      && typeof this.datepick.options.rangeDistanceDay === 'number'
+      && this.datepick.options.rangeDistanceDay > 0
+      && this.datepick.dates.length === 1
+    ) {
       maximum = addDays(this.datepick.dates[0], this.datepick.options.rangeDistanceDay);
       minimum = addDays(this.datepick.dates[0], -this.datepick.options.rangeDistanceDay);
     }
 
-    let firstDate;
-    let firstDateTime;
-    let viewYear;
-    let viewMonth;
-    let lastDate;
-    let firstOfMonth;
-    let startDate;
+    let firstDate: Date;
+    let firstDateTime: number;
+    let viewYear: number;
+    let viewMonth: number;
+    let lastDate: number;
+    let firstOfMonth: number;
+    let startDate: number;
 
     if (direction) {
       let target;
@@ -266,7 +280,8 @@ export default class Days {
       this.updateView();
     } else {
       const gridNum = Math.floor(this.datepick.options.grid / 2);
-      Array.prototype.forEach.call(this.grid, (target, index) => {
+
+      Array.prototype.forEach.call(this.grid, (target: HTMLElement, index: number) => {
         firstDate = new Date(addMonths(this.first, index - gridNum));
         firstDateTime = getTime(firstDate);
         viewYear = firstDate.getFullYear();
@@ -288,93 +303,138 @@ export default class Days {
     }
   }
 
-  renderCell (grid, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay }) {
-    Array.from(grid.children).forEach((ele: any, ind) => {
-      const current = addDays(startDate, ind);
+  renderCell (grid: HTMLElement, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay }) {
+    console.log(this.datepick);
+    Array.prototype.forEach.call(grid.children, (element: HTMLElement, index: number) => {
+      const current = addDays(startDate, index);
       const date = new Date(current);
 
-      ele.className = 'datepick-cell day';
-      ele.dataset.date = current;
+      element.className = 'datepick-cell day';
+      element.dataset.date = current.toString();
 
-      emptyChildNodes(ele);
+      emptyChildNodes(element);
 
-      if (this.datepick.options.dayClass && typeof this.datepick.options.dayClass === 'string') {
-        ele.className += ` ${this.datepick.options.dayClass}`;
+      if (
+        this.datepick.options.dayClass
+        && typeof this.datepick.options.dayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.dayClass}`;
       }
 
-      if (ind === 0 && this.datepick.options.startDayClass && typeof this.datepick.options.startDayClass === 'string') {
-        ele.className += ` ${this.datepick.options.startDayClass}`;
+      if (
+        index === 0
+        && this.datepick.options.startDayClass
+        && typeof this.datepick.options.startDayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.startDayClass}`;
       }
 
-      if (ind === (grid.children.length - 1) && this.datepick.options.endDayClass && typeof this.datepick.options.endDayClass === 'string') {
-        ele.className += ` ${this.datepick.options.endDayClass}`;
+      if (
+        index === (grid.children.length - 1)
+        && this.datepick.options.endDayClass
+        && typeof this.datepick.options.endDayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.endDayClass}`;
       }
 
-      if (getTime(firstDate) === current && this.datepick.options.firstDayClass && typeof this.datepick.options.firstDayClass === 'string') {
-        ele.className += ` ${this.datepick.options.firstDayClass}`;
+      if (
+        getTime(firstDate) === current
+        && this.datepick.options.firstDayClass
+        && typeof this.datepick.options.firstDayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.firstDayClass}`;
       }
 
-      if (getTime(lastDate) === current && this.datepick.options.lastDayClass && typeof this.datepick.options.lastDayClass === 'string') {
-        ele.className += ` ${this.datepick.options.lastDayClass}`;
+      if (
+        getTime(lastDate) === current
+        && this.datepick.options.lastDayClass
+        && typeof this.datepick.options.lastDayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.lastDayClass}`;
       }
 
       if (current < firstDate) {
-        ele.className += ' prev';
+        element.className += ' prev';
       } else if (current > lastDate) {
-        ele.className += ' next';
+        element.className += ' next';
       }
 
       if (todayDate === current) {
-        ele.className += ' today';
+        element.className += ' today';
       }
 
-      if (current < this.datepick.options.minDate || current > this.datepick.options.maxDate || (maximum && current > maximum) || (minimum && current < minimum) || disabledDate.includes(current)) {
-        ele.className += ' disabled';
+      if (
+        current < this.datepick.options.minDate
+        || current > this.datepick.options.maxDate
+        || (maximum && current > maximum)
+        || (minimum && current < minimum)
+        || disabledDate.includes(current)
+      ) {
+        element.className += ' disabled';
       }
 
-      if (ind % 7 === 0 && this.datepick.options.sundayClass && typeof this.datepick.options.sundayClass === 'string') {
-        ele.className += ` ${this.datepick.options.sundayClass}`;
+      if (
+        index % 7 === 0
+        && this.datepick.options.sundayClass
+        && typeof this.datepick.options.sundayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.sundayClass}`;
       }
 
-      if (ind % 7 === 6 && this.datepick.options.saturdayClass && typeof this.datepick.options.saturdayClass === 'string') {
-        ele.className += ` ${this.datepick.options.saturdayClass}`;
+      if (
+        index % 7 === 6
+        && this.datepick.options.saturdayClass
+        && typeof this.datepick.options.saturdayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.saturdayClass}`;
       }
 
-      if (hoildayDate.includes(current) && this.datepick.options.holidayClass && typeof this.datepick.options.holidayClass === 'string') {
-        ele.className += ` ${this.datepick.options.holidayClass}`;
+      if (
+        hoildayDate.includes(current)
+        && this.datepick.options.holidayClass
+        && typeof this.datepick.options.holidayClass === 'string'
+      ) {
+        element.className += ` ${this.datepick.options.holidayClass}`;
       }
 
       if (highlightedDate.includes(current)) {
-        ele.className += ' highlighted';
+        element.className += ' highlighted';
       }
 
-      if (this.datepick.options.range && this.datepick.dates instanceof Array && this.datepick.dates.length > 1) {
+      if (
+        this.datepick.options.range
+        && this.datepick.dates instanceof Array
+        && this.datepick.dates.length > 1
+      ) {
         const rangeStart = this.datepick.dates[0];
         const rangeEnd = this.datepick.dates[1];
 
         if (current > rangeStart && current < rangeEnd) {
-          ele.className += ' range';
+          element.className += ' range';
         }
 
         if (current === rangeStart) {
-          ele.className += ' range-start';
+          element.className += ' range-start';
         }
 
         if (current === rangeEnd) {
-          ele.className += ' range-end';
+          element.className += ' range-end';
         }
       }
 
       if (this.selected.includes(current)) {
-        ele.className += ' selected';
+        element.className += ' selected';
       }
 
-      if (!(this.datepick.options.hidePrevNextDate && current < firstDate) && !(this.datepick.options.hidePrevNextDate && current > lastDate)) {
+      if (
+        !(this.datepick.options.hidePrevNextDate && current < firstDate)
+        && !(this.datepick.options.hidePrevNextDate && current > lastDate)
+      ) {
         customDayElement
-          ? ele.appendChild(parseHTML(customDayElement(this.datepick, current)))
-          : ele.appendChild(parseHTML(`<span class="date">${date.getDate()}</span>`));
+          ? element.appendChild(parseHTML(customDayElement(this.datepick, current)))
+          : element.appendChild(parseHTML(`<span class="date">${date.getDate()}</span>`));
       } else {
-        ele.classList.add('hide');
+        element.classList.add('hide');
       }
     });
 
@@ -448,15 +508,15 @@ export default class Days {
     });
   }
 
-  setViewTitle (title) {
+  setViewTitle (title: string) {
     this.datepick.controls.title.textContent = title;
   }
 
-  setPrevBtnDisabled (disabled) {
+  setPrevBtnDisabled (disabled: boolean) {
     this.datepick.controls.prevBtn.disabled = disabled;
   }
 
-  setNextBtnDisabled (disabled) {
+  setNextBtnDisabled (disabled: boolean) {
     this.datepick.controls.nextBtn.disabled = disabled;
   }
 }

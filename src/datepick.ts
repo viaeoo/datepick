@@ -47,7 +47,7 @@ class Datepick {
 
   constructor (element: Element, options: Options) {
     this.element = element;
-    this.options = deepCopy({ ...options, ...defaultOption });
+    this.options = deepCopy({ ...defaultOption, ...options });
     this.dates = [];
 
     this.setInit();
@@ -288,6 +288,15 @@ class Datepick {
     this.active = true;
   }
 
+  hide () {
+    if (!this.active) {
+      return;
+    }
+
+    this.container.classList.remove('active');
+    this.active = false;
+  }
+
   getDate (format = undefined) {
     const { options, dates } = this;
     const { locale, range, multiple } = options;
@@ -453,13 +462,13 @@ class Datepick {
     return limitToRange(viewDate instanceof Date ? viewDate.getTime() : viewDate, minDate, maxDate);
   }
 
-  private validateDate (value: Date|number, format: string, locale: Locale, originValue: Date|number) {
+  validateDate (value: Date|number, format: string, locale: Locale, originValue: Date|number) {
     const date = parseDate(value, format, locale);
 
     return date !== undefined ? date : originValue;
   }
 
-  private renderSetting (datepick: this, options: Options) {
+  renderSetting (datepick: this, options: Options) {
     // Set prev btn
     if (
       options.prevBtnText
