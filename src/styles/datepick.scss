@@ -148,6 +148,7 @@
     &.hide {
       visibility: hidden;
       padding: 0;
+      height: 0;
     }
   }
 
@@ -214,11 +215,15 @@
   }
 
   &:not(.fade):not(.swipe).vertical {
+    .datepick-view {
+      height: 100%;
+    }
+
     .datepick-days {
       display: flex;
       align-items: flex-start;
       flex-direction: column;
-      height: 240px;
+      height: 300px;
     }
 
     .datepick-grid {
