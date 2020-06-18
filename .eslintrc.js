@@ -23,7 +23,7 @@ module.exports = {
       'error',
       {
         before: true,
-        after: true
+        after: true,
       },
     ],
     'comma-dangle': [
@@ -72,5 +72,5 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-  }
-}
+  },
+};
