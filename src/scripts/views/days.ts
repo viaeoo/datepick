@@ -44,15 +44,10 @@ export default class Days {
     const weekNode = parser(week(options));
     const daysNode = parser(days(options));
 
-    this.view = parser('<div class="datepick-view"></div>').firstElementChild as HTMLElement;
-    this.week = weekNode.firstElementChild as HTMLElement;
-    this.days = daysNode.firstElementChild as HTMLElement;
-
-    this.grid = [];
-    for (let i = 0; i < datepick.options.grid; i++) {
-      const node: any = daysNode.firstChild;
-      this.grid.push(node.children[i]);
-    }
+    this.view = parser('<div class="datepick-view"></div>').firstChild as HTMLElement;
+    this.week = weekNode.firstChild as HTMLElement;
+    this.days = daysNode.firstChild as HTMLElement;
+    this.grid = Array.from(daysNode.firstChild.childNodes) as HTMLElement[];
 
     if (!datepick.options.hideWeek) {
       this.view.appendChild(weekNode);
@@ -66,10 +61,11 @@ export default class Days {
   }
 
   setOptions (options: IOptions): void {
-    let daysFormat = null;
+    let days = null;
 
     if (options.lang) {
-      daysFormat = options.locale.dowFormat === 'D' ? options.locale.daysShort : options.locale.days;
+      days = options.locale.dowFormat === 'D' ? options.locale.daysShort : options.locale.days;
+
       this.titleFormat = options.locale.titleFormat;
       this.title = formatDate(this.datepick.viewDate, options.locale.titleFormat, options.locale);
     }
@@ -78,22 +74,30 @@ export default class Days {
       this.active = Math.floor(options.grid / 2);
     }
 
-    Array.from(this.week.children).forEach((el: any, index) => {
-      const dow = index % 7;
-
-      el.textContent = daysFormat[dow];
-      el.className = 'dow';
-
-      if (
-        options.dowClass
-      ) {
-        el.className += ` ${options.dowClass}`;
-      }
-    });
+    for (let i = 0; i < this.week.children.length; i++) {
+      this.week.children[i].textContent = days[i];
+      this.week.children[i].className = options.dowClass ? `dow ${options.dowClass}` : 'dow';
+    }
   }
 
-  updateView (): void {
+  updateView (opt = {}): void {
     const { datepick, titleFormat } = this;
+
+    const viewOptions = Object.assign({
+      scroll: false,
+      direction: null,
+      viewDate: null,
+    }, opt);
+
+    if (viewOptions.direction === 'next') {
+      datepick.viewDate = addMonths(datepick.viewDate, 1);
+    } else if (viewOptions.direction === 'prev') {
+      datepick.viewDate = addMonths(datepick.viewDate, -1);
+    }
+
+    if (viewOptions.viewDate) {
+      datepick.viewDate = viewOptions.viewDate;
+    }
 
     const viewDate = new Date(datepick.viewDate);
     const viewYear = viewDate.getFullYear();
@@ -109,8 +113,11 @@ export default class Days {
     this.start = start;
     this.end = addDays(start, 41);
     this.title = formatDate(viewDate, titleFormat, datepick.options.locale);
-    this.renderFirst = addMonths(this.first, -gridNum);
-    this.renderLast = addMonths(this.first, gridNum);
+
+    if (!viewOptions.scroll) {
+      this.renderFirst = addMonths(this.first, -gridNum);
+      this.renderLast = addMonths(this.first, gridNum);
+    }
 
     this.updateControl(
       this.title,
@@ -123,9 +130,10 @@ export default class Days {
 
   updateSelected (): void {
     const { dates } = this.datepick;
-    this.selected = dates instanceof Array
-      ? dates.map((date) => { return getTime(date); })
-      : [ getTime(dates) ];
+
+    this.selected = dates.map((date) => {
+      return getTime(date);
+    });
   }
 
   updateControl (title: string, first: Date|number, last: Date|number, minDate: Date|number, maxDate: Date|number): void {
@@ -136,19 +144,16 @@ export default class Days {
 
   updateActive (): void {
     if (this.datepick.options.grid > 1) {
-      Array.prototype.forEach.call(this.grid, (item) => {
-        item.classList.remove('active');
-      });
+      for (let i = 0; i < this.grid.length; i++) {
+        this.grid[i].classList.remove('active');
+      }
 
       this.grid[this.active].classList.add('active');
     }
   }
 
   updateGrid (): void {
-    this.grid = [];
-    for (let i = 0; i < this.datepick.options.grid; i++) {
-      this.grid.push(this.days.children[i] as HTMLElement);
-    }
+    this.grid = Array.from(this.days.childNodes) as HTMLElement[];
   }
 
   async render (): Promise<any> {
@@ -199,7 +204,7 @@ export default class Days {
     this.updateActive();
   }
 
-  renderGrid (direction = null): void {
+  renderGrid (direction = null, onlyRender = false): void {
     let maximum: number;
     let minimum: number;
 
@@ -273,7 +278,10 @@ export default class Days {
       }
 
       target.dataset.date = `${firstDateTime}-${lastDate}`;
-      this.datepick.viewDate = addMonths(this.datepick.viewDate, amount);
+
+      if (!onlyRender) {
+        this.datepick.viewDate = addMonths(this.datepick.viewDate, amount);
+      }
 
       this.updateGrid();
       this.renderCell(
@@ -290,24 +298,33 @@ export default class Days {
         customDayElement,
         customInsertBeforeDay,
         customInsertAfterDay,
-        );
+      );
 
-      if (direction === 'next') {
+      if (
+        direction === 'next'
+        && !onlyRender
+      ) {
         this.days.removeChild(this.grid[0]);
       }
 
-      if (direction === 'prev') {
+      if (
+        direction === 'prev'
+        && !onlyRender
+      ) {
         this.days.removeChild(this.days.children[this.datepick.options.grid]);
       }
 
       this.updateGrid();
-      this.updateActive();
-      this.updateView();
+
+      if (!onlyRender) {
+        this.updateActive();
+        this.updateView();
+      }
     } else {
       const gridNum = Math.floor(this.datepick.options.grid / 2);
 
-      Array.prototype.forEach.call(this.grid, (target: HTMLElement, index: number) => {
-        firstDate = new Date(addMonths(this.first, index - gridNum));
+      for (let i = 0; i < this.grid.length; i++) {
+        firstDate = new Date(addMonths(this.first, i - gridNum));
         firstDateTime = getTime(firstDate);
         viewYear = firstDate.getFullYear();
         viewMonth = firstDate.getMonth();
@@ -315,16 +332,15 @@ export default class Days {
         firstOfMonth = dateValue(viewYear, viewMonth, 1);
         startDate = dayOfTheWeekOf(firstOfMonth, 0);
 
-        if (index === 0) {
+        if (i === 0) {
           this.renderFirst = firstDateTime;
-        } else if (index === this.grid.length - 1) {
+        } else if (i === this.grid.length - 1) {
           this.renderLast = firstDateTime;
         }
 
-        target.dataset.date = `${firstDateTime}-${lastDate}`;
+        this.grid[i].dataset.date = `${firstDateTime}-${lastDate}`;
 
-        this.renderCell(
-          target,
+        this.renderCell(this.grid[i],
           startDate,
           firstDate,
           lastDate,
@@ -338,7 +354,7 @@ export default class Days {
           customInsertBeforeDay,
           customInsertAfterDay,
         );
-      });
+      }
     }
   }
 
