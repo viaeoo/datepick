@@ -1,4 +1,4 @@
-export interface Locale {
+export interface ILocale {
   days: Array<string>;
   daysShort: Array<string>;
   months: Array<string>;

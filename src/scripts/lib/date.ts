@@ -1,5 +1,5 @@
 export function getTime (date: Date|number): number {
-  return new Date(date).setHours(0, 0, 0, 0);
+  return new Date(date).getTime();
 }
 
 export function today (): number {
@@ -8,9 +8,8 @@ export function today (): number {
 
 export function dateValue (year: number, month: number, day: number): number {
   const newDate = new Date();
-  newDate.setFullYear(year, month, day);
 
-  return newDate.setHours(0, 0, 0, 0);
+  return newDate.setFullYear(year, month, day);
 }
 
 export function addDays (date: Date|number, amount: number): number {
@@ -40,8 +39,6 @@ export function addMonths (date: Date|number, amount: number): number {
 }
 
 export function addYears (date: Date|number, amount: number): number {
-  // If the date is Feb 29 and the new year is not a leap year, Feb 28 of the
-  // new year will be returned.
   const newDate = new Date(date);
   const expectedMonth = newDate.getMonth();
   const time = newDate.setFullYear(newDate.getFullYear() + amount);

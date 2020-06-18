@@ -42,7 +42,9 @@ export function deepCopy <T> (target: T): T {
   
   if (target instanceof Array) {
     const cp = [] as any[];
-    (target as any[]).forEach((v) => { cp.push(v); });
+    (target as any[]).forEach((v) => {
+      cp.push(v);
+    });
 
     return cp.map((n: any) => deepCopy<any>(n)) as any;
   }
@@ -58,4 +60,10 @@ export function deepCopy <T> (target: T): T {
   }
   
   return target;
+}
+
+let debounce = null;
+export function debounceFn (fn: () => any, sec: number): void {
+  clearTimeout(debounce);
+  debounce = setTimeout(fn, sec);
 }

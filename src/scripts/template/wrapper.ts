@@ -1,7 +1,7 @@
-import { Options } from '../interface/options';
+import { IOptions } from '../interface/options';
 import { optimizeTemplateHTML } from '../lib/utlis';
 
-const wrapper = (options: Options) => {
+const wrapper = (options: IOptions): string => {
   return optimizeTemplateHTML(`
     <div class="datepick${options.containerClass ? ` ${options.containerClass}` : ''}">
       <div class="datepick-header${options.headerClass ? ` ${options.headerClass}` : ''}">

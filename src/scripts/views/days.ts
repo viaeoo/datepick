@@ -1,10 +1,10 @@
-// Interface
-import { Options } from '../../scripts/interface/options';
+import { IDatepick } from '../../scripts/interface/datepick';
+import { IOptions } from '../../scripts/interface/options';
 
 // Lib
 import { today, dateValue, addDays, addMonths, dayOfTheWeekOf, getTime } from '../lib/date';
 import { formatDate } from '../lib/format';
-import { parseHTML, emptyChildNodes } from '../lib/dom';
+import { parser, eraser } from '../lib/dom';
 
 // Templates
 import week from '../template/week';
@@ -12,12 +12,11 @@ import days from '../template/days';
 import grid from '../template/grid';
 
 export default class Days {
-  public datepick: any;
-
-  public view: Element;
-  public week: Element;
-  public days: Element;
-  public grid: Array<Element>;
+  public datepick: IDatepick;
+  public view: HTMLElement;
+  public week: HTMLElement;
+  public days: HTMLElement;
+  public grid: Array<HTMLElement>;
 
   public titleFormat: string;
   public title: string;
@@ -35,21 +34,21 @@ export default class Days {
 
   public selected: Array<Date | number>;
 
-  constructor (datepick: any) {
+  constructor (datepick: IDatepick) {
     this.datepick = datepick;
     this.setInit();
   }
 
-  setInit () {
+  setInit (): void {
     const { datepick } = this;
     const { options } = datepick;
 
-    const weekNode = parseHTML(week(options));
-    const daysNode = parseHTML(days(options));
+    const weekNode = parser(week(options));
+    const daysNode = parser(days(options));
 
-    this.view = parseHTML('<div class="datepick-view"></div>').firstElementChild;
-    this.week = weekNode.firstElementChild;
-    this.days = daysNode.firstElementChild;
+    this.view = parser('<div class="datepick-view"></div>').firstElementChild as HTMLElement;
+    this.week = weekNode.firstElementChild as HTMLElement;
+    this.days = daysNode.firstElementChild as HTMLElement;
 
     this.grid = [];
     for (let i = 0; i < datepick.options.grid; i++) {
@@ -68,7 +67,7 @@ export default class Days {
     this.updateSelected();
   }
 
-  setOptions (options: Options) {
+  setOptions (options: IOptions): void {
     let daysFormat = null;
 
     if (options.lang) {
@@ -95,7 +94,7 @@ export default class Days {
     });
   }
 
-  updateView () {
+  updateView (): void {
     const { datepick, titleFormat } = this;
 
     const viewDate = new Date(datepick.viewDate);
@@ -111,74 +110,88 @@ export default class Days {
     this.last = dateValue(viewYear, viewMonth + 1, 0);
     this.start = start;
     this.end = addDays(start, 41);
-    this.title = formatDate(viewDate, titleFormat, datepick.options.lang);
+    this.title = formatDate(viewDate, titleFormat, datepick.options.locale);
     this.renderFirst = addMonths(this.first, -gridNum);
     this.renderLast = addMonths(this.first, gridNum);
 
-    this.updateControl({ title: this.title, first: this.first, last: this.last, minDate: datepick.options.minDate, maxDate: datepick.options.maxDate});
+    this.updateControl(
+      this.title,
+      this.first,
+      this.last,
+      datepick.options.minDate,
+      datepick.options.maxDate,
+    );
   }
 
-  updateSelected () {
+  updateSelected (): void {
     const { dates } = this.datepick;
     this.selected = dates instanceof Array
       ? dates.map((date) => { return getTime(date); })
       : [ getTime(dates) ];
   }
 
-  updateControl ({ title, first, last, minDate, maxDate }) {
+  updateControl (title: string, first: Date|number, last: Date|number, minDate: Date|number, maxDate: Date|number): void {
     this.setViewTitle(title);
     this.setPrevBtnDisabled(first <= minDate);
     this.setNextBtnDisabled(last >= maxDate);
   }
 
-  updateActive () {
+  updateActive (): void {
     if (this.datepick.options.grid > 1) {
       Array.prototype.forEach.call(this.grid, (item) => {
         item.classList.remove('active');
       });
+
       this.grid[this.active].classList.add('active');
     }
   }
 
-  updateGrid () {
+  updateGrid (): void {
     this.grid = [];
     for (let i = 0; i < this.datepick.options.grid; i++) {
-      this.grid.push(this.days.children[i]);
+      this.grid.push(this.days.children[i] as HTMLElement);
     }
   }
 
-  async render () {
+  async render (): Promise<any> {
     const { datepick, title, first, last } = this;
-    const { options, renderDirection } = datepick;
+    const { options } = datepick;
 
     if (
       options.beforeRender
       && typeof options.beforeRender === 'function'
     ) {
-      await options.beforeRender(datepick, renderDirection || null);
+      await options.beforeRender(datepick);
     }
 
-    this.updateControl({ title, first, last, minDate: options.minDate, maxDate: options.maxDate });
-    this.renderGrid(renderDirection);
+    this.updateControl(
+      title,
+      first,
+      last,
+      options.minDate,
+      options.maxDate,
+    );
+
+    this.renderGrid();
     this.updateActive();
 
     if (
       options.afterRender
       && typeof options.afterRender === 'function'
     ) {
-      await options.afterRender(datepick, renderDirection || null);
+      await options.afterRender(datepick);
     }
   }
 
-  renderToday () {
-    emptyChildNodes(this.days);
+  renderToday (): void {
+    eraser(this.days);
 
     let days = '';
     for (let i = 0; i < this.datepick.options.grid; i++) {
       days += grid(this.datepick.options, true);
     }
 
-    this.days.appendChild(parseHTML(days));
+    this.days.appendChild(parser(days));
     this.datepick.viewDate = getTime(today());
 
     this.updateGrid();
@@ -188,9 +201,9 @@ export default class Days {
     this.updateActive();
   }
 
-  renderGrid (direction = null) {
-    let maximum = null;
-    let minimum = null;
+  renderGrid (direction = null): void {
+    let maximum: number;
+    let minimum: number;
 
     const customDayElement = this.datepick.options.customDayElement && typeof this.datepick.options.customDayElement === 'function'
       ? this.datepick.options.customDayElement
@@ -239,8 +252,8 @@ export default class Days {
     let startDate: number;
 
     if (direction) {
-      let target;
-      const node = parseHTML(grid(this.datepick.options, true));
+      let target: HTMLElement;
+      const node = parser(grid(this.datepick.options, true));
       const amount = direction === 'next' ? 1 : -1;
 
       firstDate = new Date(addMonths(amount > 0 ? this.renderLast : this.renderFirst, amount));
@@ -253,19 +266,33 @@ export default class Days {
 
       if (direction === 'next') {
         this.days.appendChild(node);
-        target = this.days.lastChild;
+        target = this.days.lastChild as HTMLElement;
       }
 
       if (direction === 'prev') {
         this.days.insertBefore(node, this.grid[0]);
-        target = this.days.firstChild;
+        target = this.days.firstChild as HTMLElement;
       }
 
       target.dataset.date = `${firstDateTime}-${lastDate}`;
       this.datepick.viewDate = addMonths(this.datepick.viewDate, amount);
 
       this.updateGrid();
-      this.renderCell(target, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay });
+      this.renderCell(
+        target,
+        startDate,
+        firstDate,
+        lastDate,
+        todayDate,
+        disabledDate,
+        hoildayDate,
+        highlightedDate,
+        minimum,
+        maximum,
+        customDayElement,
+        customInsertBeforeDay,
+        customInsertAfterDay,
+        );
 
       if (direction === 'next') {
         this.days.removeChild(this.grid[0]);
@@ -298,43 +325,68 @@ export default class Days {
 
         target.dataset.date = `${firstDateTime}-${lastDate}`;
 
-        this.renderCell(target, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay });
+        this.renderCell(
+          target,
+          startDate,
+          firstDate,
+          lastDate,
+          todayDate,
+          disabledDate,
+          hoildayDate,
+          highlightedDate,
+          minimum,
+          maximum,
+          customDayElement,
+          customInsertBeforeDay,
+          customInsertAfterDay,
+        );
       });
     }
   }
 
-  renderCell (grid: HTMLElement, { startDate, firstDate, lastDate, todayDate, disabledDate, hoildayDate, highlightedDate, minimum, maximum, customDayElement, customInsertBeforeDay, customInsertAfterDay }) {
-    console.log(this.datepick);
-    Array.prototype.forEach.call(grid.children, (element: HTMLElement, index: number) => {
-      const current = addDays(startDate, index);
+  renderCell (
+    grid: HTMLElement,
+    startDate: Date|number,
+    firstDate: Date|number,
+    lastDate: Date|number,
+    todayDate: Date|number,
+    disabledDate: Array<Date|number>,
+    hoildayDate: Array<Date|number>,
+    highlightedDate: Array<Date|number>,
+    minimum: number,
+    maximum: number,
+    customDayElement: (datepick: IDatepick, current: Date|number) => string,
+    customInsertBeforeDay: (datepick: IDatepick, firstDate: Date|number) => string,
+    customInsertAfterDay: (datepick: IDatepick, lastDate: Date|number) => string,
+  ): void {
+    for (let i = 0; i < grid.children.length; i++) {
+      const current = addDays(startDate, i);
       const date = new Date(current);
+      const element = grid.children[i] as HTMLElement;
 
-      element.className = 'datepick-cell day';
-      element.dataset.date = current.toString();
-
-      emptyChildNodes(element);
+      let className = 'datepicker-cell day';
 
       if (
         this.datepick.options.dayClass
         && typeof this.datepick.options.dayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.dayClass}`;
+        className += ` ${this.datepick.options.dayClass}`;
       }
 
       if (
-        index === 0
+        i === 0
         && this.datepick.options.startDayClass
         && typeof this.datepick.options.startDayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.startDayClass}`;
+        className += ` ${this.datepick.options.startDayClass}`;
       }
 
       if (
-        index === (grid.children.length - 1)
+        i === (grid.children.length - 1)
         && this.datepick.options.endDayClass
         && typeof this.datepick.options.endDayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.endDayClass}`;
+        className += ` ${this.datepick.options.endDayClass}`;
       }
 
       if (
@@ -342,7 +394,7 @@ export default class Days {
         && this.datepick.options.firstDayClass
         && typeof this.datepick.options.firstDayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.firstDayClass}`;
+        className += ` ${this.datepick.options.firstDayClass}`;
       }
 
       if (
@@ -350,17 +402,17 @@ export default class Days {
         && this.datepick.options.lastDayClass
         && typeof this.datepick.options.lastDayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.lastDayClass}`;
+        className += ` ${this.datepick.options.lastDayClass}`;
       }
 
       if (current < firstDate) {
-        element.className += ' prev';
+        className += ' prev';
       } else if (current > lastDate) {
-        element.className += ' next';
+        className += ' next';
       }
 
       if (todayDate === current) {
-        element.className += ' today';
+        className += ' today';
       }
 
       if (
@@ -370,23 +422,23 @@ export default class Days {
         || (minimum && current < minimum)
         || disabledDate.includes(current)
       ) {
-        element.className += ' disabled';
+        className += ' disabled';
       }
 
       if (
-        index % 7 === 0
+        i % 7 === 0
         && this.datepick.options.sundayClass
         && typeof this.datepick.options.sundayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.sundayClass}`;
+        className += ` ${this.datepick.options.sundayClass}`;
       }
 
       if (
-        index % 7 === 6
+        i % 7 === 6
         && this.datepick.options.saturdayClass
         && typeof this.datepick.options.saturdayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.saturdayClass}`;
+        className += ` ${this.datepick.options.saturdayClass}`;
       }
 
       if (
@@ -394,11 +446,11 @@ export default class Days {
         && this.datepick.options.holidayClass
         && typeof this.datepick.options.holidayClass === 'string'
       ) {
-        element.className += ` ${this.datepick.options.holidayClass}`;
+        className += ` ${this.datepick.options.holidayClass}`;
       }
 
       if (highlightedDate.includes(current)) {
-        element.className += ' highlighted';
+        className += ' highlighted';
       }
 
       if (
@@ -410,20 +462,20 @@ export default class Days {
         const rangeEnd = this.datepick.dates[1];
 
         if (current > rangeStart && current < rangeEnd) {
-          element.className += ' range';
+          className += ' range';
         }
 
         if (current === rangeStart) {
-          element.className += ' range-start';
+          className += ' range-start';
         }
 
         if (current === rangeEnd) {
-          element.className += ' range-end';
+          className += ' range-end';
         }
       }
 
       if (this.selected.includes(current)) {
-        element.className += ' selected';
+        className += ' selected';
       }
 
       if (
@@ -431,29 +483,34 @@ export default class Days {
         && !(this.datepick.options.hidePrevNextDate && current > lastDate)
       ) {
         customDayElement
-          ? element.appendChild(parseHTML(customDayElement(this.datepick, current)))
-          : element.appendChild(parseHTML(`<span class="date">${date.getDate()}</span>`));
+          ? element.appendChild(parser(customDayElement(this.datepick, current)))
+          : element.appendChild(parser(`<span class="date">${date.getDate()}</span>`));
       } else {
-        element.classList.add('hide');
+        className += ' hide';
       }
-    });
+
+      element.dataset.date = `${current}`;
+      element.className = className;
+    }
 
     if (customInsertBeforeDay) {
-      grid.insertBefore(parseHTML(customInsertBeforeDay(this.datepick, getTime(firstDate))), grid.children[0]);
+      grid.insertBefore(parser(customInsertBeforeDay(this.datepick, firstDate)), grid.children[0]);
     }
 
     if (customInsertAfterDay) {
-      grid.appendChild(parseHTML(customInsertAfterDay(this.datepick, lastDate)));
+      grid.appendChild(parser(customInsertAfterDay(this.datepick, lastDate)));
     }
   }
 
-  refresh () {
+  refresh (): void {
     this.refreshGrid();
   }
 
-  refreshGrid () {
+  refreshGrid (): void {
     let rangeStart = null;
     let rangeEnd = null;
+    let maximum = null;
+    let minimum = null;
 
     const { datepick, grid, selected } = this;
 
@@ -461,31 +518,48 @@ export default class Days {
       return getTime(date);
     });
 
-    if (datepick.options.range && datepick.dates instanceof Array && datepick.dates.length > 1) {
+    if (
+      datepick.options.range
+      && datepick.dates instanceof Array
+      && datepick.dates.length > 1
+    ) {
       rangeStart = datepick.dates[0];
       rangeEnd = datepick.dates[1];
     }
 
-    grid.forEach((target) => {
-      target
+    for (let i = 0; i < grid.length; i++) {
+      grid[i]
         .querySelectorAll('.disabled, .range, .range-start, .range-end, .selected')
-        .forEach((ele) => {
-          ele.classList.remove('disabled', 'range', 'range-start', 'range-end', 'selected');
+        .forEach((element) => {
+          element.classList.remove('disabled');
+          element.classList.remove('range');
+          element.classList.remove('range-start');
+          element.classList.remove('range-end');
+          element.classList.remove('selected');
         });
 
-      Array.from(target.children).forEach((ele: any) => {
-        let maximum = null;
-        let minimum = null;
+      for (let j = 0; j < grid[i].children.length; j++) {
+        const element = grid[i].children[j] as HTMLElement;
+        const current = Number(element.dataset.date);
+        const classList = element.classList;
 
-        const current = Number(ele.dataset.date);
-        const classList = ele.classList;
-
-        if (datepick.options.rangeDistanceDay && typeof datepick.options.rangeDistanceDay === 'number' && datepick.options.rangeDistanceDay > 0 && datepick.dates.length === 1) {
+        if (
+          datepick.options.rangeDistanceDay
+          && typeof datepick.options.rangeDistanceDay === 'number'
+          && datepick.options.rangeDistanceDay > 0
+          && datepick.dates.length === 1
+        ) {
           maximum = addDays(datepick.dates[0], datepick.options.rangeDistanceDay);
           minimum = addDays(datepick.dates[0], -datepick.options.rangeDistanceDay);
         }
 
-        if (current < datepick.options.minDate || current > datepick.options.maxDate || (maximum && current > maximum) || (minimum && current < minimum) || disabledDate.includes(current)) {
+        if (
+          current < datepick.options.minDate
+          || current > datepick.options.maxDate
+          || (maximum && current > maximum)
+          || (minimum && current < minimum)
+          || disabledDate.includes(current)
+        ) {
           classList.add('disabled');
         }
 
@@ -504,19 +578,23 @@ export default class Days {
         if (selected.includes(current)) {
           classList.add('selected');
         }
-      });
-    });
+      }
+    }
   }
 
-  setViewTitle (title: string) {
+  setViewTitle (title: string): void {
     this.datepick.controls.title.textContent = title;
   }
 
-  setPrevBtnDisabled (disabled: boolean) {
-    this.datepick.controls.prevBtn.disabled = disabled;
+  setPrevBtnDisabled (disabled: boolean): void {
+    disabled
+      ? this.datepick.controls.prevBtn.setAttribute('disabled', '')
+      : this.datepick.controls.prevBtn.removeAttribute('disabled');
   }
 
-  setNextBtnDisabled (disabled: boolean) {
-    this.datepick.controls.nextBtn.disabled = disabled;
+  setNextBtnDisabled (disabled: boolean): void {
+    disabled
+      ? this.datepick.controls.nextBtn.setAttribute('disabled', '')
+      : this.datepick.controls.nextBtn.removeAttribute('disabled');
   }
 }

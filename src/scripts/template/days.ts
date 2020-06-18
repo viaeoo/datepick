@@ -1,9 +1,9 @@
-import { Options } from '../interface/options';
+import { IOptions } from '../interface/options';
 import { optimizeTemplateHTML } from '../lib/utlis';
 
 import grid from './grid';
 
-const days = (options: Options) => {
+const days = (options: IOptions): string => {
   let gridNode = '';
 
   for (let i = 0; i < options.grid; i++) {

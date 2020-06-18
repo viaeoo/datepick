@@ -1,31 +1,17 @@
 import { getTime, today } from './date';
 
-// pattern for format parts
-export const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
+import { ILocale } from '../interface/locale';
 
-// pattern for non date parts
-export const reNonDateParts = /[\s!-/:-@[-`{-~年月日]+/;
-
-function padZero (num: number, length: number): string {
-  return num.toString().padStart(length, '0');
-}
-
-function normalizeMonth (monthIndex: number): any {
-  return monthIndex > -1
-    ? monthIndex % 12 :
-    normalizeMonth(monthIndex + 12);
-}
-
-// cache for persed formats
+const reFormatTokens = /dd?|DD?|mm?|MM?|yy?(?:yy)?/;
+const reNonDateParts = /[\s!-/:-@[-`{-~年月日]+/;
 const knownFormats = {};
 
-// parse funtions for date parts
 const parseFns = {
   y (date: Date|number, year: number) {
     return new Date(date).setFullYear(year);
   },
 
-  M: undefined,  // placeholder to maintain the key order
+  M: undefined,
 
   m (date: Date|number, month: number) {
     const newDate = new Date(date);
@@ -81,6 +67,16 @@ const formatFns = {
   },
 };
 
+function padZero (num: number, length: number): string {
+  return num.toString().padStart(length, '0');
+}
+
+function normalizeMonth (monthIndex: number): any {
+  return monthIndex > -1
+    ? monthIndex % 12 :
+    normalizeMonth(monthIndex + 12);
+}
+
 function parseFormatString (format: string): any {
   if (typeof format !== 'string') {
     throw new Error('Invalid date format.');
@@ -116,7 +112,7 @@ function parseFormatString (format: string): any {
   const partParserKeys = Object.keys(partParsers);
 
   return knownFormats[format] = {
-    parser (dateStr: string, locale: any) {
+    parser (dateStr: string, locale: ILocale): Date|number {
       const dateParts = dateStr.split(reNonDateParts).reduce((dtParts, part, index) => {
         if (part.length > 0 && parts[index]) {
           const token = parts[index][0];
@@ -136,7 +132,7 @@ function parseFormatString (format: string): any {
       }, today());
     },
 
-    formatter (date: Date, locale: any) {
+    formatter (date: Date|number, locale: ILocale): string {
       let dateStr = partFormatters.reduce((str, fn, index) => {
         return str += `${separators[index]}${fn(date, locale)}`;
       }, '');
@@ -146,36 +142,28 @@ function parseFormatString (format: string): any {
   };
 }
 
-export function parseDate (dateStr: string|Date|number, format: any, locale: any): any {
+export function parseDate (date: Date|number, locale: ILocale): Date|number {
   if (
-    dateStr instanceof Date
-    || typeof dateStr === 'number'
+    date instanceof Date
+    || typeof date === 'number'
   ) {
-    const date = getTime(dateStr);
-
-    return isNaN(date) ? undefined : date;
+    return getTime(date);
   }
 
-  if (!dateStr) {
+  if (!date) {
     return undefined;
   }
 
-  if (dateStr === 'today') {
+  if (date === 'today') {
     return today();
   }
 
-  if (format && format.toValue) {
-    const date = format.toValue(dateStr, format, locale);
-
-    return isNaN(date) ? undefined : getTime(date);
-  }
-
-  return parseFormatString(format).parser(dateStr, locale);
+  return parseFormatString(locale.format).parser(date, locale);
 }
 
-export function formatDate (date: Date|number, format: any, locale: any): any {
+export function formatDate (date: Date|number, format: string, locale: ILocale): string {
   if (!date && date !== 0) {
-    return '';
+    return null;
   }
 
   const dateObj = typeof date === 'number'

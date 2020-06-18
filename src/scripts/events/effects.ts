@@ -1,4 +1,6 @@
-export function fade (datepick: any, direction: string|null): Promise<boolean> {
+import { IDatepick } from '../interface/datepick';
+
+export function fade (datepick: IDatepick, direction: string|null): Promise<boolean> {
   return new Promise((resolve) => {
     const now = datepick.views.grid[datepick.views.active];
 
@@ -23,7 +25,7 @@ export function fade (datepick: any, direction: string|null): Promise<boolean> {
   });
 }
 
-export function swipe (datepick: any, direction: string|null): Promise<boolean> {
+export function swipe (datepick: IDatepick, direction: string|null): Promise<boolean> {
   return new Promise((resolve) => {
     const calc = Math.floor(datepick.options.grid / 2) * 100;
     const init = Number(datepick.views.days.style.transform.replace(/[^\d.]/g, ''));
@@ -42,7 +44,7 @@ export function swipe (datepick: any, direction: string|null): Promise<boolean> 
   });
 }
 
-export function swipePlace (datepick: any): void {
+export function swipePlace (datepick: IDatepick): void {
   datepick.views.view.classList.add('effect');
 
   datepick.views.days.style.transition = `transform ${datepick.options.animationDuration}ms ${datepick.options.animationTiming}`;

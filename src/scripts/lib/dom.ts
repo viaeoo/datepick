@@ -1,17 +1,17 @@
-export function parseHTML (html: string): DocumentFragment {
+export function parser (html: string): DocumentFragment {
   const range = document.createRange();
 
   return range.createContextualFragment(html);
 }
 
-export function emptyChildNodes (element: any): void {
+export function eraser (element: HTMLElement): void {
   if (element.firstChild) {
     element.removeChild(element.firstChild);
-    emptyChildNodes(element);
+    eraser(element);
   }
 }
 
-export function hideElement (element: any): boolean {
+export function hide (element: HTMLElement): boolean {
   if (element.style.display === 'none') {
     return false;
   }
@@ -23,7 +23,7 @@ export function hideElement (element: any): boolean {
   element.style.display = 'none';
 }
 
-export function showElement (element: any): boolean {
+export function show (element: HTMLElement): boolean {
   if (element.style.display !== 'none') {
     return false;
   }

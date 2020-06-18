@@ -1,6 +1,6 @@
-import { Options } from '../interface/options';
+import { IOptions } from '../interface/options';
 
-const defaultOption: Options = {
+const defaultOption: IOptions = {
   // Basic
   grid: 1,
   today: null,
@@ -17,6 +17,7 @@ const defaultOption: Options = {
   range: false,
   rangeIncludeDisabled: false,
   rangeDistanceDay: 0,
+  rangeEqualDateDelete: true,
 
   // Multiple
   multiple: false,
@@ -31,8 +32,7 @@ const defaultOption: Options = {
   maxDate: null,
 
   // initial
-  dates: null,
-  initialDate: null,
+  initialDate: [],
 
   // Touch
   touchEvent: true,
@@ -44,6 +44,7 @@ const defaultOption: Options = {
   // Hide
   hideTodayBtn: false,
   hideClearBtn: false,
+  hidePrevNextBtn: false,
   hidePrevNextDate: false,
   hideWeek: false,
 
@@ -93,8 +94,8 @@ const defaultOption: Options = {
   isClickMultipleMaximum: null,
 
   afterClickDay: null,
-  afterRender: null,
   afterEffect: null,
+  afterRender: null,
 };
 
 export default defaultOption;
