@@ -1,4 +1,4 @@
-import './datepick.scss';
+import './styles/datepick.scss';
 
 import { IOptions } from './scripts/interface/options';
 
@@ -46,7 +46,6 @@ class Datepick {
     this.dates = [];
 
     this.setInit();
-    this.setRender();
     this.render(wrapper(this.options));
     this.show();
   }
@@ -224,13 +223,12 @@ class Datepick {
     this.controls = controls;
 
     const eventList = [];
-    let containerClass = '';
 
     if (
       this.options.containerClass
       && typeof this.options.containerClass === 'string'
     ) {
-      containerClass += ` ${this.options.containerClass}`;
+      this.container.classList.add(this.options.containerClass);
     }
 
     if (
@@ -238,18 +236,17 @@ class Datepick {
       && typeof this.options.mode === 'string'
       && (this.options.mode === 'swipe' || this.options.mode === 'fade')
     ) {
-      containerClass += ` ${this.options.mode}`;
+      this.container.classList.add(this.options.mode);
     }
 
     if (
       this.options.animationDirection
       && typeof this.options.animationDirection === 'string'
     ) {
-      containerClass += ` ${this.options.animationDirection}`;
+      this.container.classList.add(this.options.animationDirection);
     }
 
-    container.classList.add(containerClass);
-
+    this.setRender();
     this.viewDate = this.computeResetViewDate();
 
     eventList.push(

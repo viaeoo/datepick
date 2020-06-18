@@ -1,12 +1,10 @@
 import { IDatepick } from '../../scripts/interface/datepick';
 import { IOptions } from '../../scripts/interface/options';
 
-// Lib
 import { today, dateValue, addDays, addMonths, dayOfTheWeekOf, getTime } from '../lib/date';
 import { formatDate } from '../lib/format';
 import { parser, eraser } from '../lib/dom';
 
-// Templates
 import week from '../template/week';
 import days from '../template/days';
 import grid from '../template/grid';
@@ -364,7 +362,7 @@ export default class Days {
       const date = new Date(current);
       const element = grid.children[i] as HTMLElement;
 
-      let className = 'datepicker-cell day';
+      let className = 'datepick-cell day';
 
       if (
         this.datepick.options.dayClass
